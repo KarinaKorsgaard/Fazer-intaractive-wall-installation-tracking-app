@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2190CAC81C898E470091C66C /* ofxAutoReloadedShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2190CAC61C898E470091C66C /* ofxAutoReloadedShader.cpp */; };
+		21D968041C845727003316BE /* ofxCsv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D968021C845727003316BE /* ofxCsv.cpp */; };
 		660398161B9896EE00444604 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 660398151B9896EE00444604 /* OpenCL.framework */; };
 		6603981A1B98973100444604 /* libturbojpeg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 660398191B98973100444604 /* libturbojpeg.dylib */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
@@ -59,18 +61,6 @@
 		FFFE02EC1C579038000F902D /* Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFFE02DE1C579038000F902D /* Utilities.cpp */; };
 		FFFE02ED1C579038000F902D /* Wrappers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFFE02DF1C579038000F902D /* Wrappers.cpp */; };
 		FFFE02EE1C579038000F902D /* opencv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFFE02E01C579038000F902D /* opencv.a */; };
-		FFFE051A1C57E583000F902D /* Expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFFE04F71C57E583000F902D /* Expression.cpp */; };
-		FFFE051B1C57E583000F902D /* ExpressionClassifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFFE04F91C57E583000F902D /* ExpressionClassifier.cpp */; };
-		FFFE051C1C57E583000F902D /* ofxFaceTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFFE04FB1C57E583000F902D /* ofxFaceTracker.cpp */; };
-		FFFE051D1C57E583000F902D /* license.md in Sources */ = {isa = PBXBuildFile; fileRef = FFFE050A1C57E583000F902D /* license.md */; };
-		FFFE051E1C57E583000F902D /* CLM.cc in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05121C57E583000F902D /* CLM.cc */; };
-		FFFE051F1C57E583000F902D /* FCheck.cc in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05131C57E583000F902D /* FCheck.cc */; };
-		FFFE05201C57E583000F902D /* FDet.cc in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05141C57E583000F902D /* FDet.cc */; };
-		FFFE05211C57E583000F902D /* IO.cc in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05151C57E583000F902D /* IO.cc */; };
-		FFFE05221C57E583000F902D /* Patch.cc in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05161C57E583000F902D /* Patch.cc */; };
-		FFFE05231C57E583000F902D /* PAW.cc in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05171C57E583000F902D /* PAW.cc */; };
-		FFFE05241C57E583000F902D /* PDM.cc in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05181C57E583000F902D /* PDM.cc */; };
-		FFFE05251C57E583000F902D /* Tracker.cc in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05191C57E583000F902D /* Tracker.cc */; };
 		FFFE05611C591FB8000F902D /* BleachBypassPass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFFE052E1C591FB8000F902D /* BleachBypassPass.cpp */; };
 		FFFE05621C591FB8000F902D /* BloomPass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05301C591FB8000F902D /* BloomPass.cpp */; };
 		FFFE05631C591FB8000F902D /* ContrastPass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFFE05321C591FB8000F902D /* ContrastPass.cpp */; };
@@ -129,6 +119,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2190CAC61C898E470091C66C /* ofxAutoReloadedShader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxAutoReloadedShader.cpp; sourceTree = "<group>"; };
+		2190CAC71C898E470091C66C /* ofxAutoReloadedShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxAutoReloadedShader.h; sourceTree = "<group>"; };
+		21D968021C845727003316BE /* ofxCsv.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxCsv.cpp; sourceTree = "<group>"; };
+		21D968031C845727003316BE /* ofxCsv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxCsv.h; sourceTree = "<group>"; };
 		660398151B9896EE00444604 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
 		660398171B98972100444604 /* usb-1.0.0-superspeed.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "usb-1.0.0-superspeed.a"; path = "../libs/libusb/lib/osx/usb-1.0.0-superspeed.a"; sourceTree = "<group>"; };
 		660398191B98973100444604 /* libturbojpeg.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libturbojpeg.dylib; path = "../../ofxTurboJpeg/libs/turbo-jpeg/lib/osx/libturbojpeg.dylib"; sourceTree = "<group>"; };
@@ -233,7 +227,6 @@
 		FFFE02A51C568561000F902D /* ofApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofApp.cpp; sourceTree = "<group>"; };
 		FFFE02A61C568561000F902D /* ofApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofApp.h; sourceTree = "<group>"; };
 		FFFE02A71C568561000F902D /* PointCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloud.h; sourceTree = "<group>"; };
-		FFFE02B61C578BBF000F902D /* DetectFace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetectFace.h; sourceTree = "<group>"; };
 		FFFE02B91C579038000F902D /* ofxCv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxCv.h; sourceTree = "<group>"; };
 		FFFE02BB1C579038000F902D /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		FFFE02BF1C579038000F902D /* ETF.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETF.h; sourceTree = "<group>"; };
@@ -265,35 +258,6 @@
 		FFFE02DE1C579038000F902D /* Utilities.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Utilities.cpp; sourceTree = "<group>"; };
 		FFFE02DF1C579038000F902D /* Wrappers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Wrappers.cpp; sourceTree = "<group>"; };
 		FFFE02E01C579038000F902D /* opencv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = opencv.a; path = ../../../addons/ofxCv/../ofxOpenCv/libs/opencv/lib/osx/opencv.a; sourceTree = "<group>"; };
-		FFFE02F81C57DD8C000F902D /* shaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shaders.h; sourceTree = "<group>"; };
-		FFFE04F71C57E583000F902D /* Expression.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Expression.cpp; sourceTree = "<group>"; };
-		FFFE04F81C57E583000F902D /* Expression.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Expression.h; sourceTree = "<group>"; };
-		FFFE04F91C57E583000F902D /* ExpressionClassifier.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ExpressionClassifier.cpp; sourceTree = "<group>"; };
-		FFFE04FA1C57E583000F902D /* ExpressionClassifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExpressionClassifier.h; sourceTree = "<group>"; };
-		FFFE04FB1C57E583000F902D /* ofxFaceTracker.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxFaceTracker.cpp; sourceTree = "<group>"; };
-		FFFE04FC1C57E583000F902D /* ofxFaceTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxFaceTracker.h; sourceTree = "<group>"; };
-		FFFE04FD1C57E583000F902D /* ofxFaceTrackerThreaded.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxFaceTrackerThreaded.h; sourceTree = "<group>"; };
-		FFFE05021C57E583000F902D /* CLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLM.h; sourceTree = "<group>"; };
-		FFFE05031C57E583000F902D /* FCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCheck.h; sourceTree = "<group>"; };
-		FFFE05041C57E583000F902D /* FDet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FDet.h; sourceTree = "<group>"; };
-		FFFE05051C57E583000F902D /* IO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IO.h; sourceTree = "<group>"; };
-		FFFE05061C57E583000F902D /* Patch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Patch.h; sourceTree = "<group>"; };
-		FFFE05071C57E583000F902D /* PAW.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PAW.h; sourceTree = "<group>"; };
-		FFFE05081C57E583000F902D /* PDM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PDM.h; sourceTree = "<group>"; };
-		FFFE05091C57E583000F902D /* Tracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tracker.h; sourceTree = "<group>"; };
-		FFFE050A1C57E583000F902D /* license.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = license.md; sourceTree = "<group>"; };
-		FFFE050C1C57E583000F902D /* face.con */ = {isa = PBXFileReference; lastKnownFileType = text; path = face.con; sourceTree = "<group>"; };
-		FFFE050D1C57E583000F902D /* face.tracker */ = {isa = PBXFileReference; lastKnownFileType = text; path = face.tracker; sourceTree = "<group>"; };
-		FFFE050E1C57E583000F902D /* face.tri */ = {isa = PBXFileReference; lastKnownFileType = text; path = face.tri; sourceTree = "<group>"; };
-		FFFE050F1C57E583000F902D /* face2.tracker */ = {isa = PBXFileReference; lastKnownFileType = text; path = face2.tracker; sourceTree = "<group>"; };
-		FFFE05121C57E583000F902D /* CLM.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CLM.cc; sourceTree = "<group>"; };
-		FFFE05131C57E583000F902D /* FCheck.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FCheck.cc; sourceTree = "<group>"; };
-		FFFE05141C57E583000F902D /* FDet.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FDet.cc; sourceTree = "<group>"; };
-		FFFE05151C57E583000F902D /* IO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IO.cc; sourceTree = "<group>"; };
-		FFFE05161C57E583000F902D /* Patch.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Patch.cc; sourceTree = "<group>"; };
-		FFFE05171C57E583000F902D /* PAW.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PAW.cc; sourceTree = "<group>"; };
-		FFFE05181C57E583000F902D /* PDM.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PDM.cc; sourceTree = "<group>"; };
-		FFFE05191C57E583000F902D /* Tracker.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tracker.cc; sourceTree = "<group>"; };
 		FFFE052E1C591FB8000F902D /* BleachBypassPass.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BleachBypassPass.cpp; sourceTree = "<group>"; };
 		FFFE052F1C591FB8000F902D /* BleachBypassPass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleachBypassPass.h; sourceTree = "<group>"; };
 		FFFE05301C591FB8000F902D /* BloomPass.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BloomPass.cpp; sourceTree = "<group>"; };
@@ -363,6 +327,42 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2190CAC41C898E470091C66C /* ofxAutoReloadedShader */ = {
+			isa = PBXGroup;
+			children = (
+				2190CAC51C898E470091C66C /* src */,
+			);
+			name = ofxAutoReloadedShader;
+			sourceTree = "<group>";
+		};
+		2190CAC51C898E470091C66C /* src */ = {
+			isa = PBXGroup;
+			children = (
+				2190CAC61C898E470091C66C /* ofxAutoReloadedShader.cpp */,
+				2190CAC71C898E470091C66C /* ofxAutoReloadedShader.h */,
+			);
+			name = src;
+			path = ../../../addons/ofxAutoReloadedShader/src;
+			sourceTree = "<group>";
+		};
+		21D968001C845727003316BE /* ofxCsv */ = {
+			isa = PBXGroup;
+			children = (
+				21D968011C845727003316BE /* src */,
+			);
+			name = ofxCsv;
+			sourceTree = "<group>";
+		};
+		21D968011C845727003316BE /* src */ = {
+			isa = PBXGroup;
+			children = (
+				21D968021C845727003316BE /* ofxCsv.cpp */,
+				21D968031C845727003316BE /* ofxCsv.h */,
+			);
+			name = src;
+			path = ../../../addons/ofxCsv/src;
+			sourceTree = "<group>";
+		};
 		6948EE371B920CB800B5AC1A /* frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -379,9 +379,10 @@
 				FFFE02271C568425000F902D /* ofxMultiKinectV2 */,
 				FFFE02951C568430000F902D /* ofxTurboJpeg */,
 				FFFE02B71C579038000F902D /* ofxCv */,
-				FFFE04F51C57E583000F902D /* ofxFaceTracker */,
 				FFFE052C1C591FB8000F902D /* ofxPostProcessing */,
 				FF057EAD1C5A2A0400CCD59A /* ofxGui */,
+				21D968001C845727003316BE /* ofxCsv */,
+				2190CAC41C898E470091C66C /* ofxAutoReloadedShader */,
 			);
 			name = addons;
 			sourceTree = "<group>";
@@ -414,11 +415,9 @@
 				FFFE02A51C568561000F902D /* ofApp.cpp */,
 				FFFE02A61C568561000F902D /* ofApp.h */,
 				FFFE02A71C568561000F902D /* PointCloud.h */,
-				FFFE02B61C578BBF000F902D /* DetectFace.h */,
 				FF057EA91C5A206100CCD59A /* Body.h */,
 				FF057EAA1C5A206100CCD59A /* DetectBody.cpp */,
 				FF057EAB1C5A206100CCD59A /* DetectBody.h */,
-				FFFE02F81C57DD8C000F902D /* shaders.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -875,107 +874,6 @@
 			path = src;
 			sourceTree = "<group>";
 		};
-		FFFE04F51C57E583000F902D /* ofxFaceTracker */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE04F61C57E583000F902D /* src */,
-				FFFE04FE1C57E583000F902D /* libs */,
-			);
-			name = ofxFaceTracker;
-			sourceTree = "<group>";
-		};
-		FFFE04F61C57E583000F902D /* src */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE04F71C57E583000F902D /* Expression.cpp */,
-				FFFE04F81C57E583000F902D /* Expression.h */,
-				FFFE04F91C57E583000F902D /* ExpressionClassifier.cpp */,
-				FFFE04FA1C57E583000F902D /* ExpressionClassifier.h */,
-				FFFE04FB1C57E583000F902D /* ofxFaceTracker.cpp */,
-				FFFE04FC1C57E583000F902D /* ofxFaceTracker.h */,
-				FFFE04FD1C57E583000F902D /* ofxFaceTrackerThreaded.h */,
-			);
-			name = src;
-			path = ../../../addons/ofxFaceTracker/src;
-			sourceTree = "<group>";
-		};
-		FFFE04FE1C57E583000F902D /* libs */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE04FF1C57E583000F902D /* FaceTracker */,
-			);
-			name = libs;
-			path = ../../../addons/ofxFaceTracker/libs;
-			sourceTree = "<group>";
-		};
-		FFFE04FF1C57E583000F902D /* FaceTracker */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE05001C57E583000F902D /* include */,
-				FFFE050A1C57E583000F902D /* license.md */,
-				FFFE050B1C57E583000F902D /* model */,
-				FFFE05101C57E583000F902D /* src */,
-			);
-			path = FaceTracker;
-			sourceTree = "<group>";
-		};
-		FFFE05001C57E583000F902D /* include */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE05011C57E583000F902D /* FaceTracker */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
-		FFFE05011C57E583000F902D /* FaceTracker */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE05021C57E583000F902D /* CLM.h */,
-				FFFE05031C57E583000F902D /* FCheck.h */,
-				FFFE05041C57E583000F902D /* FDet.h */,
-				FFFE05051C57E583000F902D /* IO.h */,
-				FFFE05061C57E583000F902D /* Patch.h */,
-				FFFE05071C57E583000F902D /* PAW.h */,
-				FFFE05081C57E583000F902D /* PDM.h */,
-				FFFE05091C57E583000F902D /* Tracker.h */,
-			);
-			path = FaceTracker;
-			sourceTree = "<group>";
-		};
-		FFFE050B1C57E583000F902D /* model */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE050C1C57E583000F902D /* face.con */,
-				FFFE050D1C57E583000F902D /* face.tracker */,
-				FFFE050E1C57E583000F902D /* face.tri */,
-				FFFE050F1C57E583000F902D /* face2.tracker */,
-			);
-			path = model;
-			sourceTree = "<group>";
-		};
-		FFFE05101C57E583000F902D /* src */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE05111C57E583000F902D /* lib */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		FFFE05111C57E583000F902D /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				FFFE05121C57E583000F902D /* CLM.cc */,
-				FFFE05131C57E583000F902D /* FCheck.cc */,
-				FFFE05141C57E583000F902D /* FDet.cc */,
-				FFFE05151C57E583000F902D /* IO.cc */,
-				FFFE05161C57E583000F902D /* Patch.cc */,
-				FFFE05171C57E583000F902D /* PAW.cc */,
-				FFFE05181C57E583000F902D /* PDM.cc */,
-				FFFE05191C57E583000F902D /* Tracker.cc */,
-			);
-			path = lib;
-			sourceTree = "<group>";
-		};
 		FFFE052C1C591FB8000F902D /* ofxPostProcessing */ = {
 			isa = PBXGroup;
 			children = (
@@ -1135,26 +1033,22 @@
 				FFFE028E1C568425000F902D /* resources.inc in Sources */,
 				FFFE02E11C579038000F902D /* ETF.cpp in Sources */,
 				FFFE056D1C591FB8000F902D /* KaleidoscopePass.cpp in Sources */,
-				FFFE05201C57E583000F902D /* FDet.cc in Sources */,
 				FFFE02941C568425000F902D /* usb_control.cpp in Sources */,
-				FFFE051C1C57E583000F902D /* ofxFaceTracker.cpp in Sources */,
 				FFFE02E21C579038000F902D /* fdog.cpp in Sources */,
 				FF057EC31C5A2A0400CCD59A /* ofxLabel.cpp in Sources */,
 				FFFE056F1C591FB8000F902D /* LUTPass.cpp in Sources */,
 				FFFE02E41C579038000F902D /* ContourFinder.cpp in Sources */,
 				FFFE02861C568425000F902D /* double_buffer.cpp in Sources */,
-				FFFE05251C57E583000F902D /* Tracker.cc in Sources */,
 				FFFE05781C591FB8000F902D /* VerticalTiltShifPass.cpp in Sources */,
+				21D968041C845727003316BE /* ofxCsv.cpp in Sources */,
 				FFFE05771C591FB8000F902D /* ToonPass.cpp in Sources */,
 				FFFE05611C591FB8000F902D /* BleachBypassPass.cpp in Sources */,
 				FFFE02831C568425000F902D /* command_transaction.cpp in Sources */,
 				FFFE02881C568425000F902D /* frame_listener_impl.cpp in Sources */,
 				FFFE02E51C579038000F902D /* Distance.cpp in Sources */,
-				FFFE051E1C57E583000F902D /* CLM.cc in Sources */,
 				FF057EC01C5A2A0400CCD59A /* ofxBaseGui.cpp in Sources */,
 				FFFE02E61C579038000F902D /* Flow.cpp in Sources */,
 				FFFE05641C591FB8000F902D /* ConvolutionPass.cpp in Sources */,
-				FFFE051F1C57E583000F902D /* FCheck.cc in Sources */,
 				FFFE05681C591FB8000F902D /* FakeSSSPass.cpp in Sources */,
 				FFFE02ED1C579038000F902D /* Wrappers.cpp in Sources */,
 				FFFE02841C568425000F902D /* depth_packet_processor.cpp in Sources */,
@@ -1164,6 +1058,7 @@
 				FFFE02EA1C579038000F902D /* RunningBackground.cpp in Sources */,
 				FFFE02A81C568561000F902D /* main.cpp in Sources */,
 				FFFE028A1C568425000F902D /* opencl_depth_packet_processor.cpp in Sources */,
+				2190CAC81C898E470091C66C /* ofxAutoReloadedShader.cpp in Sources */,
 				FFFE02E81C579038000F902D /* Kalman.cpp in Sources */,
 				FFFE056A1C591FB8000F902D /* GodRaysPass.cpp in Sources */,
 				FFFE05791C591FB8000F902D /* ZoomBlurPass.cpp in Sources */,
@@ -1175,20 +1070,16 @@
 				FFFE028F1C568425000F902D /* rgb_packet_processor.cpp in Sources */,
 				FFFE02871C568425000F902D /* event_loop.cpp in Sources */,
 				FFFE05741C591FB8000F902D /* RGBShiftPass.cpp in Sources */,
-				FFFE051A1C57E583000F902D /* Expression.cpp in Sources */,
 				FFFE02E91C579038000F902D /* ObjectFinder.cpp in Sources */,
 				FFFE05671C591FB8000F902D /* EdgePass.cpp in Sources */,
 				FF057EC11C5A2A0400CCD59A /* ofxButton.cpp in Sources */,
 				FFFE028B1C568425000F902D /* packet_pipeline.cpp in Sources */,
-				FFFE051D1C57E583000F902D /* license.md in Sources */,
 				FFFE05721C591FB8000F902D /* PostProcessing.cpp in Sources */,
 				FFFE02921C568425000F902D /* tinythread.cpp in Sources */,
 				FFFE056B1C591FB8000F902D /* HorizontalTiltShifPass.cpp in Sources */,
 				FFFE05751C591FB8000F902D /* RimHighlightingPass.cpp in Sources */,
-				FFFE05231C57E583000F902D /* PAW.cc in Sources */,
 				FFFE02A91C568561000F902D /* ofApp.cpp in Sources */,
 				FFFE05691C591FB8000F902D /* FxaaPass.cpp in Sources */,
-				FFFE05211C57E583000F902D /* IO.cc in Sources */,
 				FF057EC61C5A2A0400CCD59A /* ofxSliderGroup.cpp in Sources */,
 				FF057EC41C5A2A0400CCD59A /* ofxPanel.cpp in Sources */,
 				FFFE05661C591FB8000F902D /* DofPass.cpp in Sources */,
@@ -1198,13 +1089,10 @@
 				FF057EC21C5A2A0400CCD59A /* ofxGuiGroup.cpp in Sources */,
 				FFFE056E1C591FB8000F902D /* LimbDarkeningPass.cpp in Sources */,
 				FFFE02821C568425000F902D /* ofProtonect2.cpp in Sources */,
-				FFFE051B1C57E583000F902D /* ExpressionClassifier.cpp in Sources */,
 				FFFE02EB1C579038000F902D /* Tracker.cpp in Sources */,
-				FFFE05221C57E583000F902D /* Patch.cc in Sources */,
 				FFFE05651C591FB8000F902D /* DofAltPass.cpp in Sources */,
 				FFFE02901C568425000F902D /* rgb_packet_stream_parser.cpp in Sources */,
 				FFFE05711C591FB8000F902D /* PixelatePass.cpp in Sources */,
-				FFFE05241C57E583000F902D /* PDM.cc in Sources */,
 				FF057EC51C5A2A0400CCD59A /* ofxSlider.cpp in Sources */,
 				FFFE027F1C568425000F902D /* ofxMultiKinectV2.cpp in Sources */,
 				FFFE05731C591FB8000F902D /* RenderPass.cpp in Sources */,
@@ -1394,6 +1282,11 @@
 					"../../../addons/ofxTurboJpeg/libs/turbo-jpeg/lib",
 					"../../../addons/ofxTurboJpeg/libs/turbo-jpeg/lib/osx",
 					../../../addons/ofxTurboJpeg/src,
+					HEADER_SEARCH_PATHS,
+					"=",
+					"$(OF_CORE_HEADERS)",
+					"\"../../../addons/ofxOpenCv/libs/opencv/include/\"",
+					"\"../../../addons/ofxCv/libs/ofxCv/include/\"",
 				);
 				ICON = "$(ICON_NAME_DEBUG)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
@@ -1411,7 +1304,7 @@
 					"../../../addons/ofxTurboJpeg/libs/turbo-jpeg/lib/osx/libturbojpeg.dylib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)Debug";
-				USER_HEADER_SEARCH_PATHS = "../../../addons/ofxCv/libs/CLD/include/ ../../../addons/ofxCv/libs/ofxCv/include/ ../../../addons/ofxMultiKinectV2/libs/protonect/include/ ../../../addons/ofxTurboJpeg/libs/turbo-jpeg/include/ ../../../addons/ofxFaceTracker/libs/FaceTracker/include/ ../../../addons/ofxMultiKinectV2/libs/libfreenect2/include/ ../../../addons/ofxCv/../ofxOpenCv/libs/opencv/include ../../../addons/ofxMultiKinectV2/libs/libusb/include/";
+				USER_HEADER_SEARCH_PATHS = "../../../addons/ofxCv/libs/CLD/include/ ../../../addons/ofxMultiKinectV2/libs/protonect/include/ ../../../addons/ofxMultiKinectV2/libs/libusb/include/ ../../../addons/ofxTurboJpeg/libs/turbo-jpeg/include/ ../../../addons/ofxUnicode/libs/utf8cpp/include/ ../../../addons/ofxFaceTracker/libs/FaceTracker/include/ ../../../addons/ofxMultiKinectV2/libs/libfreenect2/include/ ../../../addons/ofxCv/../ofxOpenCv/libs/opencv/include ../../../addons/ofxCv/libs/ofxCv/include/";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1456,6 +1349,11 @@
 					"../../../addons/ofxTurboJpeg/libs/turbo-jpeg/lib",
 					"../../../addons/ofxTurboJpeg/libs/turbo-jpeg/lib/osx",
 					../../../addons/ofxTurboJpeg/src,
+					HEADER_SEARCH_PATHS,
+					"=",
+					"$(OF_CORE_HEADERS)",
+					"\"../../../addons/ofxOpenCv/libs/opencv/include/\"",
+					"\"../../../addons/ofxCv/libs/ofxCv/include/\"",
 				);
 				ICON = "$(ICON_NAME_RELEASE)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
@@ -1473,7 +1371,7 @@
 					"../../../addons/ofxTurboJpeg/libs/turbo-jpeg/lib/osx/libturbojpeg.dylib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = "../../../addons/ofxCv/libs/CLD/include/ ../../../addons/ofxCv/libs/ofxCv/include/ ../../../addons/ofxMultiKinectV2/libs/protonect/include/ ../../../addons/ofxTurboJpeg/libs/turbo-jpeg/include/ ../../../addons/ofxFaceTracker/libs/FaceTracker/include/ ../../../addons/ofxMultiKinectV2/libs/libfreenect2/include/ ../../../addons/ofxCv/../ofxOpenCv/libs/opencv/include ../../../addons/ofxMultiKinectV2/libs/libusb/include/";
+				USER_HEADER_SEARCH_PATHS = "../../../addons/ofxCv/libs/CLD/include/ ../../../addons/ofxMultiKinectV2/libs/protonect/include/ ../../../addons/ofxMultiKinectV2/libs/libusb/include/ ../../../addons/ofxTurboJpeg/libs/turbo-jpeg/include/ ../../../addons/ofxUnicode/libs/utf8cpp/include/ ../../../addons/ofxFaceTracker/libs/FaceTracker/include/ ../../../addons/ofxMultiKinectV2/libs/libfreenect2/include/ ../../../addons/ofxCv/../ofxOpenCv/libs/opencv/include ../../../addons/ofxCv/libs/ofxCv/include/";
 				WRAPPER_EXTENSION = app;
 				baseConfigurationReference = E4EB6923138AFD0F00A09F29;
 			};

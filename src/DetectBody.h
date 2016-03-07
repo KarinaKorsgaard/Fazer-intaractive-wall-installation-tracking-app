@@ -36,19 +36,24 @@ public:
     vector<ofVec2f> getbodyPos();
     vector<ofPolyline> getContours();
     
-    void setTresholds(int near, int far){
+    void setTresholds(float near, float far, float t){
         nearThreshold = near;
         farThreshold = far;
+        tilt = t;
     }
+    float test1 = 1;
+    float test2 = 1;
     
+    cv::Mat gradient;
 private:
     
     void getbodyBoundries(cv::Mat _armBlobs);
     ofVec2f findArmBase(cv::Mat tableEdges, Body &_body);
     ofVec2f findPalmCenter(Body _body);
     
-    int farThreshold;
-    int nearThreshold;
+    float farThreshold;
+    float nearThreshold;
+    float tilt;
     
     //CvCapture *capture;
     ofFbo outputImage;

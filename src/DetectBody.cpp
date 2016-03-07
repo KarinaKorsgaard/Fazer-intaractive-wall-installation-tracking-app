@@ -29,15 +29,15 @@ void DetectBody::setup( int _w, int _h, int _nearThreshold, int _farThreshold)
     ofSetLineWidth(2);
     ofEnableSmoothing();
     outputImage.end();
-
+    
     output = cv::Mat::zeros( cvSize(width,height), CV_8U );
-
+    
     
     bodyPosition = ofVec2f(-1, -1);
     
     // draw the Mask
     activeAreaMask = cv::Mat::zeros( cvSize(width,height), CV_8U );
-
+    
     
     ofImage imgToLoad;
     if( imgToLoad.load("activeAreaMask.png") ){
@@ -45,6 +45,30 @@ void DetectBody::setup( int _w, int _h, int _nearThreshold, int _farThreshold)
     }else{
         createGenericMask();
     }
+    
+    
+//    cv::Mat gradient = cv::Mat::zeros( cvSize(width,height), CV_8U );
+//    for(int x=0; x<gradient.cols; x++)
+//    {
+//        if(x>=top && x<=edge){
+//            float i = (float)(x-top)/(edge-top);
+//            float val = i*(edgeDepth-topDepth)+topDepth;
+//            for(int y=0; y<gradient.rows; y++)
+//            {
+//                gradient.at<char>(y,x) = (int)val;
+//            }
+//            //fma(t, edgeDepth, fma(-t, topDepth, topDepth));
+//        }else if(x>edge && x<=bot){
+//            float i = (float)(x-edge)/(width-edge);
+//            float val = i*(botDepth-edgeDepth)+edgeDepth;
+//            for(int y=0; y<gradient.rows; y++)
+//            {
+//                gradient.at<char>(y,x) = (int)val;
+//            }
+//        }
+//    }
+    
+
 }
 
 void DetectBody::update(cv::Mat image)
@@ -53,9 +77,42 @@ void DetectBody::update(cv::Mat image)
     
     //depthImage.copyTo(inputImage);
     
+    
+//    for(int x=0; x<depthImage.cols; x++){
+//        
+//        if(x>=top && x<=edge){
+//            float i = (float)(x-top)/(edge-top);
+//            float val = i*(edgeDepth-topDepth)+topDepth;
+//            
+//            for(int y=0; y<depthImage.rows; y++)
+//            {
+//                if(depthImage.at<char>(y,x) < (int)val) depthImage.at<char>(y,x) = 0;
+//            }
+//            
+//        }else if(x>edge && x<=bot){
+//            float i = (float)(x-edge)/(width-edge);
+//            float val = i*(botDepth-edgeDepth)+edgeDepth;
+//            
+//            for(int y=0; y<depthImage.rows; y++)
+//            {
+//                if(depthImage.at<char>(y,x) < (int)val) depthImage.at<char>(y,x) = 0;
+//            }
+//        }
+//        
+//    }
+    
     //cut Far and Near
-    threshold(depthImage, depthImage, 255-farThreshold, 0, THRESH_TOZERO);
-    threshold(depthImage, depthImage, 255-nearThreshold, 0, THRESH_TOZERO_INV);
+//    threshold(depthImage, depthImage, 255-farThreshold, 0, THRESH_TOZERO);
+//    threshold(depthImage, depthImage, 255-nearThreshold, 0, THRESH_TOZERO_INV);
+    
+//    for(int x=0; x<depthImage.cols; x++){
+//        for(int y=0; y<depthImage.rows; y++){
+//           
+//            if(depthImage.at<int>(y,x) < gradient.at<int>(y,x)){
+//                depthImage.at<int>(y,x) = 0;
+//            }
+//        }
+//    }
     
     depthImage.copyTo(inputImage);
     
@@ -91,7 +148,7 @@ void DetectBody::update(cv::Mat image)
         Mat depthImageCanny = Mat::zeros( cvSize(width,height), CV_8UC1 );
         
         
-        Canny(depthImage, depthImageCanny, 12, 7, 3); // for K:V2 130, 100, 3);
+        Canny(depthImage, depthImageCanny, test1,test2, 3); // for K:V2 130, 100, 3);
         
         dilate(depthImageCanny, depthImageCanny, cv::Mat(), cv::Point(-1,-1), 2);
         erode(depthImageCanny, depthImageCanny, cv::Mat(), cv::Point(-1,-1), 1);
@@ -140,63 +197,90 @@ void DetectBody::update(cv::Mat image)
         
     }
     
-
+    
     
     // 2nd approach
     
     
     getbodyBoundries(depthImage);
     
+    //
+    //    Mat dilatedTableEdges = Mat::zeros( cvSize(width,height), CV_8UC1 );
+    //    erode(activeAreaMask, dilatedTableEdges, cv::Mat(), cv::Point(-1,-1), 5); // last 2 closing num, may change
+    //
     
-    Mat dilatedTableEdges = Mat::zeros( cvSize(width,height), CV_8UC1 );
-    erode(activeAreaMask, dilatedTableEdges, cv::Mat(), cv::Point(-1,-1), 5); // last 2 closing num, may change
-    
-    
-    
-    for(int i=0; i<bodys.size(); i++)
-    {
-        // Find base of each arm
-        Body body = bodys[i];
-        bodys[i].armBase = findArmBase(dilatedTableEdges, body);
-        
-        
-        // Calculate the center of geometry -> allready done in getbodysBoundaries
-        
-        /*ofVec2f center;
-         for(size_t j=0; j<bodys[i].boundary.size(); j++){
-         center.operator+=(bodys[i].boundary[j]);
-         }
-         center.x = (int)(center.x / bodys[i].boundary.size());
-         center.y = (int)(center.y / bodys[i].boundary.size());
-         */
-        
-        
-        // Calculate mean depth and area and palm center
-        
-        /*   // Get arm blob
-         static BinaryImage armBlob;
-         bodys[i].CreateArmBlob(armBlob);
-         
-         // Get arm blob indices
-         static Types<Point2Di>::FlatImage armBlobIndices;
-         Util::Helpers::GetBlobIndices(armBlob, armBlobIndices);
-         
-         // Calculate mean depth
-         float depth = 0;
-         for(size_t j=0; j<armBlobIndices.size; j++)
-         {
-         Point2Di point = armBlobIndices.data[j];
-         depth += depthImageF.data[point.y][point.x];
-         }
-         depth /= armBlobIndices.size;
-         
-         bodys[i].meanDepth = depth;
-         bodys[i].area = armBlobIndices.size;*/
-        
-        
-        // Find palm center
-        body = bodys[i];
-        bodys[i].palmCenter = findPalmCenter(body);
+    if(bodys.size()>0){
+        for(vector<Body>::iterator b=bodys.begin(); b!=bodys.end(); b++)
+        {
+            // Find base of each arm
+            
+           // bodys[i].armBase = findArmBase(dilatedTableEdges, body);
+            
+//            bool rightRatio = (b->boundaryPoly.getBoundingBox().width > b->boundaryPoly.getBoundingBox().height);
+//            //bool centerAboveMid = b->centroid.y > b->boundaryPoly.getBoundingBox().height / 2;
+//            
+//            if(!rightRatio){
+//                
+//                bodys.erase(b);
+//                
+//            }
+            
+         //   else {
+                b->indices.clear();
+                
+                for(int y=0; y<b->bodyBlob.rows; y++)
+                {
+                    for(int x=0; x<b->bodyBlob.cols; x++)
+                    {
+                        if(b->bodyBlob.at<bool>(y, x))
+                        {
+                            b->indices.push_back(ofVec2f(x, y));
+                            //indices.data[indices.size] = Point2Di(x, y);
+                            //indices.size++;
+                        }
+                    }
+                }
+        //    }
+            
+            //  }
+            // Calculate the center of geometry -> allready done in getbodysBoundaries
+            
+            /*ofVec2f center;
+             for(size_t j=0; j<bodys[i].boundary.size(); j++){
+             center.operator+=(bodys[i].boundary[j]);
+             }
+             center.x = (int)(center.x / bodys[i].boundary.size());
+             center.y = (int)(center.y / bodys[i].boundary.size());
+             */
+            
+            
+            // Calculate mean depth and area and palm center
+            
+            /*   // Get arm blob
+             static BinaryImage armBlob;
+             bodys[i].CreateArmBlob(armBlob);
+             
+             // Get arm blob indices
+             static Types<Point2Di>::FlatImage armBlobIndices;
+             Util::Helpers::GetBlobIndices(armBlob, armBlobIndices);
+             
+             // Calculate mean depth
+             float depth = 0;
+             for(size_t j=0; j<armBlobIndices.size; j++)
+             {
+             Point2Di point = armBlobIndices.data[j];
+             depth += depthImageF.data[point.y][point.x];
+             }
+             depth /= armBlobIndices.size;
+             
+             bodys[i].meanDepth = depth;
+             bodys[i].area = armBlobIndices.size;*/
+            
+            
+            // Find palm center
+            //  body = bodys[i];
+            //  bodys[i].palmCenter = findPalmCenter(body);
+        }
     }
     
     
@@ -228,13 +312,13 @@ void DetectBody::drawProcess(int x, int y, int w, int h, int index)
     imgOut.draw(x, y, w, h);
     outputImageIndex = index;
     /*  1 depthImage
-        2 depthImageCanny
-        3 depthImageErodedArms
-        4 armDivider
-        5 armEdges
-        6 activeAreaMask
-        7 inputImage
-        default depthImage
+     2 depthImageCanny
+     3 depthImageErodedArms
+     4 armDivider
+     5 armEdges
+     6 activeAreaMask
+     7 inputImage
+     default depthImage
      */
 }
 
@@ -304,18 +388,35 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
     vector<double> allAreas;
     double imgArea = _armBlobs.rows * _armBlobs.cols;
     for(size_t i = 0; i < allContours.size(); i++) {
+        
         double curArea = contourArea(Mat(allContours[i]));
+        
         allAreas.push_back(curArea);
+//        if(ofxCv::toOf(allContours[i]).getBoundingBox().width>ofxCv::toOf(allContours[i]).getBoundingBox().height){
+//            allIndices.push_back(i);
+//        }
+       // allAreas[i]=contourArea(Mat(allContours[i]));
         if(curArea >= imgMinArea) {
             allIndices.push_back(i);
         }
+        // }
     }
-    
+   
     // sort by size
     if (allIndices.size() > 1) {
         std::sort(allIndices.begin(), allIndices.end(), CompareContourArea(allAreas));
     }
     
+    
+//    for(size_t i = 0; i < allIndices.size(); i++) {
+//        contoursLocal.push_back(allContours[allIndices[i]]);
+//        if( ofxCv::toOf(contoursLocal[i]).getBoundingBox().width>ofxCv::toOf(contoursLocal[i]).getBoundingBox().height){
+//            Body b = *new Body;
+//            b.boundaryPoly =ofxCv::toOf(contoursLocal[i]);
+//            bodys.push_back(b);
+//        }
+//    }
+//    
     // generate polylines and bounding boxes from the contours
     contoursLocal.clear();
     bodys.clear();
@@ -324,6 +425,8 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
     for(size_t i = 0; i < allIndices.size(); i++) {
         contoursLocal.push_back(allContours[allIndices[i]]);
         bodys[i].boundaryPoly = ofxCv::toOf(contoursLocal[i]);
+        
+        
         //  boundingRects.push_back(boundingRect(contours[i]));
         
         vector<cv::Point> tmp;
@@ -339,7 +442,7 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
         cv::drawContours(drawedContour,contourVec,0,Scalar(255,255,255),CV_FILLED, 0);
         
         
-        bodys[i].armBlob = drawedContour;
+        bodys[i].bodyBlob = drawedContour;
         
         
         
@@ -564,72 +667,72 @@ ofVec2f DetectBody::findArmBase(cv::Mat tableEdges, Body &_body)
     return armBase;
 }
 
-ofVec2f DetectBody::findPalmCenter(Body _body)
-{
-    ofVec2f palmCenter;
-    
-    Mat distImage = Mat::zeros( cvSize(width,height),  CV_32FC1 );
-    
-    //  threshold(_body.armBlob, _body.armBlob, 1, 255, THRESH_TRUNC);
-    cv::distanceTransform(_body.armBlob, distImage, CV_DIST_C, 3);  //!!Could use CV_DIST_L2 for euclidian distance
-    
-    
-    /*Mat image = Mat::zeros( cvSize(width,height),  CV_8UC1 );
-     distImage.convertTo(image, CV_8UC1, 5);
-     IplImage* img = new IplImage(image);
-     cvCopy(img, output.getCvImage());
-     output.flagImageChanged();
-     */
-    // Only check points that are farther from the arm base than the geometric center
-    float armCenterMagnitude = _body.centroid.squareDistance(_body.armBase);
-    
-    // Get arm blob indices
-    vector<ofVec2f> indices;
-    for(int y=0; y<_body.armBlob.rows; y++)
-    {
-        for(int x=0; x<_body.armBlob.cols; x++)
-        {
-            if(_body.armBlob.at<bool>(y, x))
-            {
-                indices.push_back(ofVec2f(x, y));
-                //indices.data[indices.size] = Point2Di(x, y);
-                //indices.size++;
-            }
-        }
-    }
-    
-    
-    
-    // Find the max value of the distance transform that is further from arm base than geometric center is
-    ofVec2f maxValuePoint;
-    float maxValue = 0;
-    
-    for(int i=0; i<indices.size(); i++)
-    {
-        ofVec2f point = indices[i];
-        float pointMagnitude = point.squareDistance(_body.armBase);
-        
-        float value = distImage.at<float>(point.y, point.x) * pointMagnitude;
-        //  cout << ofToString(pointMagnitude > armCenterMagnitude)+"\n";
-        if(pointMagnitude > armCenterMagnitude && value > maxValue)  // pointMagnitude > armCenterMagnitude always true;
-        {
-            maxValuePoint = point;
-            maxValue = value;
-            
-        }
-        
-    }
-    
-    
-    
-    float palmThreshold = 0;
-    if(maxValue > palmThreshold){
-        palmCenter = maxValuePoint;
-    }else{
-        palmCenter = ofVec2f(-1, -1);
-    }
-    return palmCenter;
-}
+//ofVec2f DetectBody::findPalmCenter(Body _body)
+//{
+//    ofVec2f palmCenter;
+//
+//    Mat distImage = Mat::zeros( cvSize(width,height),  CV_32FC1 );
+//
+//    //  threshold(_body.armBlob, _body.armBlob, 1, 255, THRESH_TRUNC);
+//    cv::distanceTransform(_body.bodyBlob, distImage, CV_DIST_C, 3);  //!!Could use CV_DIST_L2 for euclidian distance
+//
+//
+//    /*Mat image = Mat::zeros( cvSize(width,height),  CV_8UC1 );
+//     distImage.convertTo(image, CV_8UC1, 5);
+//     IplImage* img = new IplImage(image);
+//     cvCopy(img, output.getCvImage());
+//     output.flagImageChanged();
+//     */
+//    // Only check points that are farther from the arm base than the geometric center
+//    float armCenterMagnitude = _body.centroid.squareDistance(_body.armBase);
+//
+//    // Get arm blob indices
+//    indices.clear();
+//    for(int y=0; y<_body.bodyBlob.rows; y++)
+//    {
+//        for(int x=0; x<_body.bodyBlob.cols; x++)
+//        {
+//            if(_body.bodyBlob.at<bool>(y, x))
+//            {
+//                _body.indices.push_back(ofVec2f(x, y));
+//                //indices.data[indices.size] = Point2Di(x, y);
+//                //indices.size++;
+//            }
+//        }
+//    }
+//
+//
+//
+//    // Find the max value of the distance transform that is further from arm base than geometric center is
+//    ofVec2f maxValuePoint;
+//    float maxValue = 0;
+//
+//    for(int i=0; i<indices.size(); i++)
+//    {
+//        ofVec2f point = indices[i];
+//        float pointMagnitude = point.squareDistance(_body.armBase);
+//
+//        float value = distImage.at<float>(point.y, point.x) * pointMagnitude;
+//        //  cout << ofToString(pointMagnitude > armCenterMagnitude)+"\n";
+//        if(pointMagnitude > armCenterMagnitude && value > maxValue)  // pointMagnitude > armCenterMagnitude always true;
+//        {
+//            maxValuePoint = point;
+//            maxValue = value;
+//
+//        }
+//
+//    }
+//
+//
+//
+//    float palmThreshold = 0;
+//    if(maxValue > palmThreshold){
+//        palmCenter = maxValuePoint;
+//    }else{
+//        palmCenter = ofVec2f(-1, -1);
+//    }
+//    return palmCenter;
+//}
 
 void DetectBody::createMask(){
     inputImage.copyTo(activeAreaMask);

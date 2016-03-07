@@ -1,0 +1,31 @@
+<group>
+	<imageSetup>
+		<nearThreshold>0</nearThreshold>
+		<farThreshold>8000</farThreshold>
+	<translateX>0</translateX>
+		<translateY>-551</translateY>
+		<translateZ>20</translateZ>
+		<scaleX>0</scaleX>
+		<scaleY>0</scaleY>
+		<scaleZ>0</scaleZ>
+		<rotate>0</rotate>
+	<edge>251.306</edge>
+		<topDepth>5142.86</topDepth>
+		<botDepth>1714.29</botDepth>
+		<edgeDepth>3673.47</edgeDepth>
+	</imageSetup>
+	<group/>
+	<tilt>0</tilt>
+	<nearCut>219</nearCut>
+	<farCut>500</farCut>
+<testParams>
+		<test1>35.2041</test1>
+		<test2>136.224</test2>
+	</testParams>
+	<pointCloudSetup>
+		<tilt>27.551</tilt>
+		<translateX>459</translateX>
+		<translateY>-459</translateY>
+		<translateZ>423</translateZ>
+	</pointCloudSetup>
+</group>
