@@ -10,14 +10,12 @@ using namespace cv;
 void ofApp::setup(){
     ofSetVerticalSync(true);
     ofSetFrameRate(30);
-    
-    
-    
+
     ofTrueTypeFont::setGlobalDpi(72);
     scanImage.load("scan.png");
-    font.load("font.ttf", 12, true, true);
+   // font.load("Roboto.ttf", 12, true, true);
+    font.load("Museo_Slab.otf", 12, true, true);
     
-    renderPC.allocate(ofGetWidth(),ofGetHeight());
     //csv----------------------------
     csv.loadFile(ofToDataPath("csv/csv.csv"));
     
@@ -32,16 +30,15 @@ void ofApp::setup(){
         actors[i-1] = new Actor;
         string name = csv.getString(0, i);
         actors[i-1]->Name = name;
-        if(i%2==0){
-            actors[i-1]->att.x = ofRandom(ofGetWidth()-100,ofGetWidth());
-        }
-        else if(i%2==1){
-            actors[i-1]->att.x = ofRandom(0,100);
-        }
-        actors[i-1]->att.y = ofRandom(ofGetHeight()/2,0);
-        //actors[i-1]->att = actors[i-1]->pos;
+    
+        actors[i-1]->pos.x = ofRandom(ofGetWidth());
+        actors[i-1]->pos.y = ofRandom(ofGetHeight());
+
+        //actors[i-1]->size = ofRandom(50,100);
+        actors[i-1]->vel = ofVec2f(ofRandom(-5,5),ofRandom(-5,5));
         actors[i-1]->color = ofColor(ofRandom(80-100),ofRandom(80-100),ofRandom(100,255));
         actors[i-1]->font = &font;
+        
     }
     
     for(int i=1; i<csv.numRows; i++) {
@@ -51,14 +48,13 @@ void ofApp::setup(){
         datapoints[i-1]->pos.x = ofRandom(ofGetWidth());
         datapoints[i-1]->pos.y = ofRandom(ofGetHeight());
         
-        for(int u=1; u<csv.numCols-1; u++) {
+        for(int u=1; u<csv.numCols; u++) {
             int value = csv.getInt(i, u);
             if(value == 1){
                 datapoints[i-1]->connections.push_back(actors[u-1]);
+                actors[u-1]->size++;
             }
         }
-        int at = ofRandom(datapoints[i-1]->connections.size());
-        datapoints[i-1]->att = actors[at]->pos;
         datapoints[i-1]->font = &font;
     }
     //csv----------------------------end
@@ -74,6 +70,9 @@ void ofApp::setup(){
     detectBody.setup(512, 424, nearThreshold, farThreshold);
     
     depthShader.load("depthshader/shader");
+    scanner.load("depthshader/scan/shader");
+    renderPC.allocate(ofGetWidth(),ofGetHeight());
+    scanRender.allocate(ofGetWidth(),ofGetHeight());
     
     // Setup GUI
     imageSetup.setName("imageSetup");
@@ -87,14 +86,23 @@ void ofApp::setup(){
     
   
     pointCloudSetup.setName("pointCloudSetup");
-    pointCloudSetup.add(tilt.set("tilt", 0, -180, 180));
+    pointCloudSetup.add(tilt.set("tilt", 0, -7, 7));
     pointCloudSetup.add(translateX.set("translateX", -512, -1000, 1000));
-    pointCloudSetup.add(translateY.set("translateY", -512, -1000, 1000));
+    pointCloudSetup.add(translateY.set("translateY", -512, -3000, 1000));
     pointCloudSetup.add(translateZ.set("translateZ", -1000, -1000, 2000));
 
     testParams.setName("testParams");
     testParams.add(test1.set("test1", 0, 0,300));
     testParams.add(test2.set("test2", 0, 0, 300));
+    
+    testParams.add(bPosXlow.set("bPosXlow", 0, 0, ofGetWidth()));
+    testParams.add(thresX.set("thresX", 0, 0, ofGetWidth()));
+    
+    testParams.add(bPosYlow.set("bPosYlow", 0, 0, ofGetHeight()));
+    testParams.add(thresY.set("thresY", 0, 0, ofGetHeight()));
+
+    testParams.add(floor.set("floor", 0, -8000, 8000));
+    
     
     paramters.add(testParams);
     paramters.add(imageSetup);
@@ -108,87 +116,49 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    pointCloud.nearCut = nearCut;
-    pointCloud.farCut = farCut;
+
+    
     pointCloud.tilt = tilt;
-
+    pointCloud.translateX = translateX;
+    pointCloud.translateY = translateY;
+    pointCloud.translateZ = translateZ;
+    pointCloud.floor = floor;
     
-    //beginning
-    if(!isPersonPresent){
-        isPP=0;
-    }
-    //if person is present for more than 100 frames -> start scanDown
-    if(isPersonPresent){
-        isPP++;
-        if(isPP>isPPthres){
-            scanDown = true;
-            
+    detectPerson();
+    timeLine();
+    
+    renderPC.begin();
+    ofClear(0);
+    ofBackgroundGradient(ofColor(50), ofColor(0),OF_GRADIENT_CIRCULAR);
+    
+    
+    ofSetColor(255);
+    pointCloud.draw();
+    if(scanUp||freeze){
+        for(int i = 0; i< numDatapoints;i++ ){
+            if(datapoints[i]->isSet && datapoints[i]->pos.y > scanLine){
+                datapoints[i]->con = true;
+                datapoints[i]->draw();
+            }
         }
     }
-    // if scanline is down, scan go up.
-    if(scanDown){
-//        for(int i = 0; i<numActors;i++){
-//            actors[i]->hasConnection = false;
-//        }
-        float x = abs (scanLine - ofGetHeight())/100;
-        //  scanLine = scanLine*scanLine  ;
-       // cout<< scanLine <<endl;
-        scanLine +=5;
-        if(scanLine > ofGetHeight()-scanLineHeight){
-            scanUp = true;
-            scanDown = false;
-            //setPositions = true;
-            positions();
-        }
+    for(int i = 0; i<numActors;i++ ){
+        actors[i]->draw();
     }
 
     
-    // scan up- set datapoints positions, freese PC (updatePC) // when up, keep datapoints (freeze)
-    if(scanUp){
-        updatePC = false;
-        float x = abs (ofGetHeight() - scanLine)/100;
-        scanLine -=5;
-        if(scanLine < 0-scanLineHeight){
-            scanUp = false;
-            freeze = true; // let dataPoints stay even if scanUp = false
-            ending = true;
-        }
-    }
+    renderPC.end();
     
-    //ending (hold for endTimerThres amount of time
-    if(!ending){
-        endTimer = 0;
-    }
-    
-    if(ending){
-        endTimer++;
-        if(endTimer>endTimerThres){
-            // endAnimation = true;
-             resetAll;
-        }
-    }
-    
-    if(resetAll){
-        scanLine = 0;
-        scanUp = false;
-        scanDown = false;
-        freeze = false;
-        updatePC = true;
-        setPositions = false;
-        isPersonPresent = false;
-        isPP = 0;
-        ending = false;
-        endTimer = 0;
-        endAnimation = false;
-        resetAll = false;
-        for(int i = 0; i< numDatapoints;i++){
-            datapoints[i]->con = false;
-            datapoints[i]->tl = 0;
-        }
-    }
+    // if(scanDown||scanUp){
+   
+    //}
     
     
-    //cout<<contourPoly.size()<<endl;
+    
+    
+    
+
+    
     if(updatePC){
         kinect.update();
         if (kinect.isFrameNew()) {
@@ -227,45 +197,66 @@ void ofApp::update(){
             
             ofImage depthImage;
             depthImage.setFromPixels(depthPix);
-            
-            
-            
-            detectBody.update(ofxCv::toCv(depthImage));//kinect.getDepthPixelsRef()));
-            //detectBody.setTresholds(nearThreshold, farThreshold, tilt);
+        
+            detectBody.update(ofxCv::toCv(depthImage));
             
         }
     }
     
+
+
+
     
-    //    if(freeze){
-    //        falling +=0.1;
-    //
-    //        vector<ofVec3f>vert = pointCloud.mesh.getVertices();
-    //        pointCloud.mesh.clear();
-    //        for(int i = 0; i< vert.size();i++){
-    //            ofVec3f pt;
-    //            if(vert[i].y<424){
-    //                pt = ofVec3f(vert[i].x,vert[i].y-falling,vert[i].z);
-    //            }
-    //            else{
-    //                pt = ofVec3f(vert[i].x,vert[i].y,vert[i].z);
-    //            }
-    //            pointCloud.mesh.addVertex(pt);
-    //
-    //        }
-    //    }
+    //ofPushMatrix();
     
-    /*
-     cam.update();
-     if(cam.isFrameNew()) {
-     detectFace.update(cam);
-     }
-     cout << "imageType: "+ofToString(cam.getPixelFormat())+"\n";*/
     
-    //scanLine = scaleZ;
-    // pointCloud.scanLine = scanLine;//-ofGetHeight()+(ofGetHeight()-(scanLine))+324;//(ofGetHeight()-((scanLine)))-424;
+
+    
+
     detectBody.test1 = test1;
     detectBody.test2 = test2;
+    
+    for(int i = 0; i< numActors;i++){
+        for(int j = 0; j< numActors;j++){
+            int minDist =actors[i]->size + actors[j]->size;
+            int x1 = actors[i]->pos.x;
+            int x2 = actors[j]->pos.x;
+            int y1 = actors[i]->pos.y;
+            int y2 = actors[j]->pos.y;
+            
+            int dist = ofDist(x1,y1,x2,y2);
+            
+            if(dist<minDist){
+                
+//                ofVec2f v =actors[j]->vel;
+//                actors[j]->vel = actors[i]->vel;
+//                actors[i]->vel = v;
+                
+                ofVec2f collision = actors[i]->pos - actors[j]->pos;
+                double distance = collision.length();
+                if (distance == 0.0) {              // hack to avoid div by zero
+                    collision = ofVec2f(1.0, 0.0);
+                    distance = 1.0;
+                }
+            
+                // Get the components of the velocity vectors which are parallel to the collision.
+                // The perpendicular component remains the same for both fish
+                collision = collision / distance;
+                double aci = actors[i]->vel.dot(collision);
+                double bci =actors[j]->vel.dot(collision);
+                
+                // Solve for the new velocities using the 1-dimensional elastic collision equations.
+                // Turns out it's really simple when the masses are the same.
+                double acf = bci;
+                double bcf = aci;
+                
+                // Replace the collision velocity components with the new ones
+                //actors[i]->vel += (acf - aci) * collision;
+                actors[j]->vel += (bcf - bci) * collision;
+            }
+        }
+    }
+
     
 }
 
@@ -273,102 +264,42 @@ void ofApp::update(){
 void ofApp::draw(){
     
     
-    renderPC.begin();
-    ofClear(0);
     
+    
+    
+    
+    
+    renderPC.getTexture().bind();
 
-    ofPushMatrix();
+    scanner.begin();
     
-   
-    ofScale(-1, -1, 1);
-   // ofTranslate(-387 + translateX, -602 + translateY, -1000 +translateZ);
-    ofTranslate(translateX,translateY,translateZ);
-    ofRotateX(tilt);
-    //ofRotateY(180);
-    //ofPushMatrix();
-   // ofTranslate(ofGetWidth()/2, ofGetHeight()/2,translateZ/2);
-   // ofRotateY(ofGetFrameNum());
+    
+    
+    scanner.setUniform2f("u_resolution", ofGetWidth(),ofGetHeight());
+    scanner.setUniform1f("scanline", ofGetFrameNum()%ofGetHeight());
+    // scanner.setUniformTexture("tex", renderPC.getTexture(),0);
 
     ofSetColor(255);
-    pointCloud.draw(0,0,0);
-  //  pointCloud.draw(0,0,0);
+    ofFill();
+    //    ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
 
-    //ofPopMatrix();
-    ofPopMatrix();
-    renderPC.end();
-    
-    ofSetColor(255);
-    ofBackgroundGradient(ofColor(50), ofColor(0),OF_GRADIENT_CIRCULAR);
-    
-    
-    
-    renderPC.draw(0,0);
-    
-    
-    if(scanUp||freeze){
-        for(int i = 0; i< numDatapoints;i++ ){
-            if(datapoints[i]->isSet && datapoints[i]->pos.y > scanLine){
-                datapoints[i]->con = true;
-                datapoints[i]->draw();
-            }
-        }
-    }
-    
-    for(int i = 0; i<numActors;i++ ){
-        actors[i]->draw();
-    }
-    
-    if(scanDown||scanUp){
-       // ofSetLineWidth(1);
-        float m = ofGetFrameNum()*50 % ofGetWidth();
-        scanImage.draw(m-ofGetWidth(),scanLine,ofGetWidth()+(ofGetHeight()-m),20);
+    renderPC.draw(0, 0);
+    scanner.end();
 
-    }
+    renderPC.getTexture().unbind();
+
     
-    ofSetColor(255);
-    contourPC.draw();
-//    
-//    
-//    cv::Mat contourPCMat;
-//    contourPCMat = cv::Mat::zeros( cvSize(ofGetWidth(),ofGetHeight()), CV_8U );
-//    ofPixels imagePC;
-//    renderPC.readToPixels(imagePC);
-//    //imagePC.convertTo(contourPCMat, CV_8UC1);
-//    ofxCv::toCv(imagePC).convertTo(contourPCMat, CV_8UC1);
-//    
-//    int closingNum = 10;
-//    bitwise_not(contourPCMat, contourPCMat);
-//    erode(contourPCMat, contourPCMat, cv::Mat(), cv::Point(-1,-1), closingNum);
-//    // dilate(contourPCMat, contourPCMat, cv::Mat(), cv::Point(-1,-1), closingNum);
-//    bitwise_not(contourPCMat, contourPCMat);
-//    ofxCv::ContourFinder contourFindPC;
-//    contourFindPC.setSortBySize(true);
-//    contourFindPC.findContours(contourPCMat);
-//    
-//    if(contourFindPC.getPolylines().size()>0){
-//        
-//        contourPC = contourFindPC.getPolyline(0);
-//        
-//        
-//        ofBeginShape();
-//        ofFill();
-//        ofSetColor(200, 0, 0);
-//        ofVertex(0, 0);
-//        ofVertex(ofGetWidth(), 0);
-//        ofVertex(ofGetWidth(), ofGetHeight());
-//        ofVertex(0, ofGetHeight());
-//        ofVertex(0, 1);
-//        for( int i = 0; i < contourPC.getVertices().size(); i++) {
-//            
-//            ofVertex(contourPC.getVertices().at(i).x, contourPC.getVertices().at(i).y);
-//            
-//        }
-//        
-//        ofEndShape();
-//    }
+
+    
     
     
     if(bDebug){
+        
+        ofNoFill();
+        detectPerson();
+        ofDrawRectangle(bPosXlow, bPosYlow,thresX, thresY);
+        
+        
         detectBody.drawProcess(10, 300, 512/2, 424/2, imgIndx);
         detectBody.drawOverlay(10, 300, 512/2, 424/2);
         ofSetColor(0,255,0);
@@ -402,13 +333,9 @@ void ofApp::draw(){
         
         
         ofSetWindowTitle("FrameRate: "+ ofToString(ofGetFrameRate()));
-        // ofDrawBitmapStringHighlight("Device Count : " + ofToString(ofxMultiKinectV2::getDeviceCount()), 10, 40);
+
     }
     
-
-    
-
-
     
 };
 
@@ -449,30 +376,9 @@ void ofApp::keyPressed(int key){
     
     if(key == 'p'){
         
-        //setPositions = true;
-        scanDown  = true;
-        //        for(int i  = 0 ; i<numDatapoints;i++ ){
-        //            datapoints[i]->tl = 0;
-        //        }
-        
+        setPositions = true;
     }
     
-    if(key == 'r'){
-        scanLine = 0;
-        scanUp = false;
-        scanDown = false;
-        freeze = false;
-        updatePC = true;
-        setPositions = false;
-        isPersonPresent = false;
-        isPP = 0;
-        isPPthres = 100;
-        ending = false;
-        endTimer = 0;
-        endTimerThres = 100;
-        endAnimation = false;
-        resetAll = false;
-    }
     
     if(key == '1') {
         imgIndx = 1;
@@ -563,13 +469,11 @@ void ofApp::positions(){
     contourPCMat = cv::Mat::zeros( cvSize(ofGetWidth(),ofGetHeight()), CV_8U );
     ofPixels imagePC;
     renderPC.readToPixels(imagePC);
-    //imagePC.convertTo(contourPCMat, CV_8UC1);
     ofxCv::toCv(imagePC).convertTo(contourPCMat, CV_8UC1);
     
     int closingNum = 10;
     bitwise_not(contourPCMat, contourPCMat);
     erode(contourPCMat, contourPCMat, cv::Mat(), cv::Point(-1,-1), closingNum);
-    // dilate(contourPCMat, contourPCMat, cv::Mat(), cv::Point(-1,-1), closingNum);
     bitwise_not(contourPCMat, contourPCMat);
     ofxCv::ContourFinder contourFindPC;
     contourFindPC.setSortBySize(true);
@@ -580,10 +484,9 @@ void ofApp::positions(){
         contourPC = contourFindPC.getPolyline(0);
 
         
-        int h = contourPC.getBoundingBox().height*.90;
-        int w = contourPC.getBoundingBox().width*.80;
+        int h = contourPC.getBoundingBox().height/2;
+        int w = contourPC.getBoundingBox().width/2;
         int a = contourPC.getArea();
-       // int aPixelsPrWord = (w*h)/numDatapoints;
         
         int stepX = sqrt((w*w) / numDatapoints);
         int stepY = sqrt((h*h) / numDatapoints);
@@ -591,7 +494,8 @@ void ofApp::positions(){
         
         int dp = 0;
         int step =1;
-        if(stepY<20){stepY = 20;}
+        //min step in y so they dont overlap
+        if(stepY<10){stepY = 20;}
         for(int y = 0 ; y < ofGetHeight() ; y+=stepY){
             
             step = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width+20;
@@ -602,24 +506,135 @@ void ofApp::positions(){
                 ofPoint p = ofPoint(x,y);
                 
                 if(contourPC.inside(p)){
-                    //  float dist = kinect.getDistanceAt(x, y);
-                    //  ofVec3f pt= kinect.getWorldCoordinateAt(y, x, dist);
                     datapoints[dp]->pos.x = x;
                     if(dp%2==0){
                     datapoints[dp]->pos.y = y + stepY/2;
                     }else{
                     datapoints[dp]->pos.y = y;
                     }
-                    //    datapoints[dp]->posZ = pt.z;
                     datapoints[dp]->isSet = true;
                     dp ++;
                     dp = dp%numDatapoints;
-                    
                 }
             }
         }
+    }
+}
+//--------------------------------------------------------------
+
+
+void ofApp::detectPerson(){
+    
+    if(detectBody.getbodys().size()>0){
+        ofPolyline p = detectBody.getbodys()[0].boundaryPoly;
+        if(p.getBoundingBox().width > p.getBoundingBox().height){
+            if(detectBody.getbodys()[0].centroid.x >bPosXlow &&
+               detectBody.getbodys()[0].centroid.x <bPosXlow+thresX &&
+               detectBody.getbodys()[0].centroid.y >bPosYlow &&
+               detectBody.getbodys()[0].centroid.y <bPosYlow+thresY
+               ){
+                isPersonPresent = true;
+            }else{
+                isPersonPresent = false;
+                
+            }
+            
+            
+        }
+        if(bDebug){
+            ofDrawEllipse(detectBody.getbodys()[0].centroid,20,20);
+        }
         
     }
-
-
+}
+//--------------------------------------------------------------
+void ofApp::timeLine(){
+    //beginning
+    if(!isPersonPresent){
+        isPPtimer=0;
+    }
+    
+    //if person is present for more than 100 frames -> start scanDown
+    if(isPersonPresent && !active){
+        isPPtimer++;
+        if(isPPtimer>isPPthres){
+            scanDown = true;
+            active = true;
+        }
+    }
+    
+    // if scanline is down, scan go up.
+    if(scanDown){
+        //        for(int i = 0; i<numActors;i++){
+        //            actors[i]->hasConnection = false;
+        //        }
+        float x = abs (scanLine - ofGetHeight())/100;
+        //  scanLine = scanLine*scanLine  ;
+        // cout<< scanLine <<endl;
+        scanLine +=5;
+        if(scanLine > ofGetHeight()){
+            scanUp = true;
+            scanDown = false;
+            positions();
+        }
+    }
+    
+    
+    // scan up- set datapoints positions, freese PC (updatePC) // when up, keep datapoints (freeze)
+    if(scanUp){
+        updatePC = false;
+        float x = abs (ofGetHeight() - scanLine)/100;
+        scanLine -=5;
+        if(scanLine < 0){
+            scanUp = false;
+            freeze = true; // let dataPoints stay even if scanUp = false
+            ending = true;
+            pointCloud.vel.clear();
+            pointCloud.collapse = ofGetHeight()/2;
+            
+        }
+    }
+    
+    //ending (hold for endTimerThres amount of time
+    if(!ending){
+        endTimer = 0;
+    }
+    
+    if(ending){
+        endTimer++;
+        if(endTimer>endTimerThres){
+            
+            pointCloud.fall();
+            for(int i = 0; i<numDatapoints;i++){
+                datapoints[i]->fall=true;
+            }
+            if(datapoints[0]->tl<-1){
+                resetAll = true;
+            }
+            // endAnimation = true;
+            // resetAll;
+        }
+    }
+    
+    if(resetAll || !isPersonPresent){
+        scanLine = 0;
+        scanUp = false;
+        scanDown = false;
+        freeze = false;
+        updatePC = true;
+        setPositions = false;
+        isPersonPresent = false;
+        isPPtimer = 0;
+        ending = false;
+        endTimer = 0;
+        endAnimation = false;
+        resetAll = false;
+        for(int i = 0; i< numDatapoints;i++){
+            datapoints[i]->con = false;
+            datapoints[i]->tl = 0;
+            datapoints[i]->fall = false;
+        }
+        active = false;
+        //datapoints->shuffle();
+    }
 }

@@ -29,25 +29,39 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    void positions();
-    ofPolyline contourPC;
-    
-    
-    void loadActors();
-    
     float getAvgDepth(ofRectangle space, ofxMultiKinectV2 *kinect);
+    void positions();
+    void detectPerson();
+    void timeLine();
     
-    ofxMultiKinectV2 kinect;
-
+    ofPolyline contourPC;
     ofTrueTypeFont	font;
-    
-    //ofEasyCam ecam;
-    
+    ofxMultiKinectV2 kinect;
     PointCloud pointCloud;
-    ofPixels colorPix;
-    
-   
     DetectBody detectBody;
+    ofImage scanImage;
+    
+    ofTexture depthTex;
+    ofxAutoReloadedShader depthShader;
+    ofxAutoReloadedShader scanner;
+    ofFbo depthFbo;
+    ofFbo scanRender;
+    ofFbo renderPC;
+    DataPoint** datapoints;
+    Actor** actors;
+    wng::ofxCsv csv;
+    
+    int numDatapoints, numActors;
+    float falling;
+    int top = 0;
+    int bot = ofGetWidth();
+    int imgIndx = 0;
+    
+    int setPoints;
+
+   // ofPixels colorPix;
+    
+    
     
     float scanLine;
     
@@ -57,25 +71,25 @@ class ofApp : public ofBaseApp{
     bool updatePC = true;
     bool setPositions;
     bool isPersonPresent = false;
-    int isPP = 0;
+    int isPPtimer = 0;
     int isPPthres = 100;
     bool ending = false;
     int endTimer = 0;
     int endTimerThres = 100;
     bool endAnimation = false;
     bool resetAll = false;
+    bool active = false;
+  
     
     bool bDebug = true;
     
     int scanLineHeight = 100;
     
-    ofImage scanImage;
-    
-    ofFbo renderPC;
     
     
-    int timer;
-    vector<ofPolyline> contourPoly;
+    
+    
+   // vector<ofPolyline> contourPoly;
     
     // GUI / Controlpanel
     ofxPanel gui;
@@ -83,22 +97,16 @@ class ofApp : public ofBaseApp{
     ofParameterGroup pointCloudSetup;
     ofParameterGroup testParams;
     ofParameterGroup paramters;
-    ofParameter<float>   test1;
+    ofParameter<float>   test1; // idle GUI params for testing stuff
     ofParameter<float>   test2;
     ofParameter<float>   nearThreshold;
     ofParameter<float>   farThreshold;
+    ofParameter<float>   tilt;
+
     
     ofParameter<int>   translateX;
     ofParameter<int>   translateY;
     ofParameter<int>   translateZ;
-    ofParameter<int>   scaleX;
-    ofParameter<int>   scaleY;
-    ofParameter<float>   scaleZ;
-    ofParameter<int>   rotate;
-     
-    ofParameter<float>   tilt;
-    ofParameter<int>   nearCut;
-    ofParameter<int>   farCut;
     
     ofParameter<float>edge;
     ofParameter<float>topDepth;
@@ -106,32 +114,12 @@ class ofApp : public ofBaseApp{
     ofParameter<float>botDepth;
     ofParameter<float>edgeDepth;
     
-    int top = 0;
-    //int edge = ofGetWidth()*2/3;
-    int bot = ofGetWidth();
-    
-    // de tre verdier hvor gradienten starter og hvor den slutter
-    // nok alle tre skal kunne styres med en slider
-//    int topDepth = 200;
-//    int edgeDepth = 30;
-//    int botDepth = 150;
-    
-    int imgIndx = 0;
-    
-    ofTexture depthTex;
-    ofxAutoReloadedShader depthShader;
-    
-    ofFbo depthFbo;
-    
-    DataPoint** datapoints;
-    Actor** actors;
-    
-    wng::ofxCsv csv;
-    int numDatapoints, numActors;
-    float falling;
-    
-    int largestBlob;
-    int setPoints;
+    ofParameter<int>   bPosXlow;
+    ofParameter<int>   thresX;
+    ofParameter<int>   bPosYlow;
+    ofParameter<int>   thresY;
+    ofParameter<int>   floor;
     
     
+   
 };

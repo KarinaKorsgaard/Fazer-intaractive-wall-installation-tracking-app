@@ -328,14 +328,14 @@ vector<Body> DetectBody::getbodys(){
     return bodys;
 }
 
-vector<ofVec2f> DetectBody::getbodyPos(){
-    vector <ofVec2f> bodyPositions;
-    for(int i=0; i < bodys.size(); i++){
-        ofVec2f point = bodys[i].palmCenter;
-        bodyPositions.push_back(point);
-    }
-    return bodyPositions;
-}
+//vector<ofVec2f> DetectBody::getbodyPos(){
+//    vector <ofVec2f> bodyPositions;
+//    for(int i=0; i < bodys.size(); i++){
+//        ofVec2f point = bodys[i].palmCenter;
+//        bodyPositions.push_back(point);
+//    }
+//    return bodyPositions;
+//}
 
 vector<ofPolyline> DetectBody::getContours(){
     vector<ofPolyline> bodysPolys;
