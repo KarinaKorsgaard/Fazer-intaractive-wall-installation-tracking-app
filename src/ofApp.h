@@ -75,11 +75,13 @@ class ofApp : public ofBaseApp{
     int isPPthres = 100;
     bool ending = false;
     int endTimer = 0;
-    int endTimerThres = 100;
+    int endTimerThres = 600;
     bool endAnimation = false;
     bool resetAll = false;
     bool active = false;
-  
+    bool startFall = false;
+    int lastTimer = 0;
+    int lastTimerThres = 120;
     
     bool bDebug = true;
     
@@ -87,7 +89,7 @@ class ofApp : public ofBaseApp{
     
     
     
-    
+    int counter = 0;
     
    // vector<ofPolyline> contourPoly;
     
@@ -119,6 +121,8 @@ class ofApp : public ofBaseApp{
     ofParameter<int>   bPosYlow;
     ofParameter<int>   thresY;
     ofParameter<int>   floor;
+    
+  
     
     
    

@@ -4,6 +4,11 @@ uniform sampler2DRect tex0;
 
 varying vec2 texCoordVarying;
 
+float hash(float x)
+{
+    return fract(sin(x*.0127863)*17143.321); //decent hash for noise generation
+}
+
 void main()
 {
     vec2 uv = gl_FragCoord.xy / u_resolution.xy;
@@ -12,15 +17,23 @@ void main()
     vec3 text = tex.xyz;
     
     
-    vec3 defaultColor = vec3(1.);
+    vec3 defaultColor = vec3(1.,1.,1.);
     
     vec3 finalColor = defaultColor;
     float value = scanline/u_resolution.y;
     vec2 aniuv = uv - value;
-    finalColor *= abs (0.9 / sin((aniuv.y)) * 0.01 ) + 0.0;
-   
-        finalColor += text * defaultColor;
+    finalColor *= abs (0.05 / sin((aniuv.y)) * .10 ) + 0.0;
 
+    if(finalColor.r>0.9){
+        finalColor -= text * defaultColor;
+        //finalColor*=hash( u_resolution.x);
+//        if(finalColor.r<0.5){
+//            finalColor = vec3(1.);
+//        }
+    }else{
+        finalColor += text * defaultColor;
+    }
+    
     
     gl_FragColor =  vec4(finalColor, 1.);
     //gl_FragColor = vec4(1.);

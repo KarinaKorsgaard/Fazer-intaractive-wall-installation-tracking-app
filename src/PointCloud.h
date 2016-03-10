@@ -9,6 +9,7 @@
 #include "ofMain.h"
 #include "ofxMultiKinectV2.h"
 #include "DetectBody.h"
+#include "ofxAutoReloadedShader.h"
 
 class PointCloud{
     
@@ -28,7 +29,7 @@ public:
     
     ofFbo renderer;
     ofVbo vbo;
-    ofShader shaderSplineReplace;
+    ofxAutoReloadedShader shaderSplineReplace;
     ofTexture texSpline;
     
     
@@ -48,14 +49,16 @@ public:
         renderer.begin();
         ofClear(255,255,255, 0);
         // load the texure
-        //ofDisableArbTex();
-        ofLoadImage(texSpline, "dot.png");
         ofEnableSmoothing();
         renderer.end();
         
+        //ofDisableArbTex();
+        ofDisableArbTex();
+        ofLoadImage(texSpline, "dot.png");
+        ofEnableArbTex();
+        
         vector<ofVec3f> vel;
         // load the shader
-        
         // shaderSplineReplace.setupShaderFromSource(GL_VERTEX_SHADER, splineReplaceShader);
         // shaderSplineReplace.linkProgram();
         shaderSplineReplace.load("shaders/shader");
@@ -63,38 +66,46 @@ public:
     }
     
     void update(ofxMultiKinectV2 *kinect, vector<Body> bodies){
-        //use larger ofPoly? - to get a les sharp outline...
+        
         mesh.clear();
+        int indx = 0;
         
         if(bodies.size()>0){
             for(vector<ofVec2f>::iterator ind=bodies[0].indices.begin(); ind!=bodies[0].indices.end(); ind++){
+                indx++;
                 
-                float dist = kinect->getDistanceAt(ind->x, ind->y);
-                
-                ofVec3f pt = kinect->getWorldCoordinateAt(ind->y,ind->x,dist);
-                
-                pt.x += translateX;
-                pt.y += translateY;
-                pt.z += translateZ;
-                
-                float y = pt.y;
-                float z = pt.z;
-                
-                pt.y = y*cos(tilt)-z*sin(tilt);
-                pt.z = y*sin(tilt)+z*cos(tilt);
-                
-                // pt.set(x,y,dist);
-                
-                // ofColor c;
-                // float h = ofMap(dist, 0, 8000, 255, 100, true);
-                // c.setHsb(255, h ,255);
-                
-                
-                // c = ofFloatColor(ofNoise((dist+ofGetFrameNum()/10)*0.001, (dist+ofGetFrameNum())*0.001));
-                
-                // mesh.addColor(c);
-                
-                mesh.addVertex(pt);
+                if(indx%2 == 0){
+                    
+                    float dist = kinect->getDistanceAt(ind->x, ind->y);
+                    
+                    ofVec3f pt = kinect->getWorldCoordinateAt(ind->y,ind->x,dist);
+                    
+                    pt.x += translateX;
+                    pt.y += translateY;
+                    pt.z += translateZ;
+                    
+                    float y = pt.y;
+                    float z = pt.z;
+                    
+                    pt.y = y*cos(tilt)-z*sin(tilt);
+                    pt.z = y*sin(tilt)+z*cos(tilt);
+                    
+                    pt.x = ofGetWidth()-pt.x;
+                    
+                    
+                    // pt.set(x,y,dist);
+                    
+                    // ofColor c;
+                    // float h = ofMap(dist, 0, 8000, 255, 100, true);
+                    // c.setHsb(255, h ,255);
+                    
+                    
+                    // c = ofFloatColor(ofNoise((dist+ofGetFrameNum()/10)*0.001, (dist+ofGetFrameNum())*0.001));
+                    
+                    // mesh.addColor(c);
+                    
+                    mesh.addVertex(pt);
+                }
                 
             }
         }
@@ -104,6 +115,31 @@ public:
     void draw(){
         glPointSize(pointSize);
         mesh.drawVertices();
+    }
+    
+    void drawPSpline(){
+        glDepthMask(GL_FALSE);
+        
+        ofSetColor(255,120);
+        
+        ofEnableAlphaBlending();
+        // this makes everything look glowy :)
+        ofEnableBlendMode(OF_BLENDMODE_ADD);
+        // ofEnableBlendMode(OF_BLENDMODE_SCREEN);
+        
+        ofEnablePointSprites();
+        shaderSplineReplace.begin();
+        // bind the texture so that when all the points
+        // are drawn they are replace with our dot image
+        texSpline.bind();
+        vbo.draw(GL_POINTS, 0, (int)mesh.getVertices().size());
+        texSpline.unbind();
+        shaderSplineReplace.end();
+        ofDisablePointSprites();
+        ofDisableBlendMode();
+        ofDisableAlphaBlending();
+        
+        glDepthMask(GL_TRUE);
     }
     
     ofFloatPixels backgroundPix;
@@ -125,24 +161,24 @@ public:
     }
     
     void fall(){
-        collapse+= ofRandom(20);
+        collapse += ofRandom(20);
         vector<ofVec3f> p = mesh.getVertices();
-        float acc = 0.8;
+        float acc = 0.5;
         
         vel.resize(p.size());
-
+        
         for(int i = 0 ; i<p.size();i++){
             if(p[i].y<collapse){
                 vel[i].y+=acc;
                 p[i].y+=vel[i].y;
+                
                 if(vel[i].y>1){
                     p[i].x+=ofRandom(-.5,.5);
                     p[i].z+=ofRandom(-.5,.5);
                 }
                 
-                
                 if(p[i].y > floor){
-                    vel[i].y *= -ofRandom(.3,.6);
+                    vel[i].y *= -ofRandom(.5,.7);
                     p[i].y = floor;
                 }
             }
