@@ -1,11 +1,11 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxMultiKinectV2.h"
+#include "ofxKinectV2.h"
 #include "PointCloud.h"
 #include "ofxAutoReloadedShader.h"
 #include "DetectBody.h"
-
+#include "ofxSyphon.h"
 #include "ofxCv.h"
 #include "ofxGui.h"
 #include "ofxCsv.h"
@@ -29,14 +29,14 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    float getAvgDepth(ofRectangle space, ofxMultiKinectV2 *kinect);
+    float getAvgDepth(ofRectangle space, ofxKinectV2 *kinect);
     void positions();
     void detectPerson();
     void timeLine();
     
     ofPolyline contourPC;
-    ofTrueTypeFont	font;
-    ofxMultiKinectV2 kinect;
+    ofTrueTypeFont font;
+    ofxKinectV2 kinect;
     PointCloud pointCloud;
     DetectBody detectBody;
     ofImage scanImage;
@@ -51,6 +51,7 @@ class ofApp : public ofBaseApp{
     Actor** actors;
     wng::ofxCsv csv;
     
+    ofxSyphonServer syphon;
     int numDatapoints, numActors;
     float falling;
     int top = 0;
@@ -60,7 +61,6 @@ class ofApp : public ofBaseApp{
     int setPoints;
 
    // ofPixels colorPix;
-    
     
     
     float scanLine;
@@ -81,7 +81,7 @@ class ofApp : public ofBaseApp{
     bool active = false;
     bool startFall = false;
     int lastTimer = 0;
-    int lastTimerThres = 120;
+    int lastTimerThres = 200;
     
     bool bDebug = true;
     
@@ -122,7 +122,7 @@ class ofApp : public ofBaseApp{
     ofParameter<int>   thresY;
     ofParameter<int>   floor;
     
-  
+    ofRectangle thePerson;
     
     
    

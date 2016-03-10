@@ -7,7 +7,7 @@
 //
 
 #include "ofMain.h"
-#include "ofxMultiKinectV2.h"
+#include "ofxKinectV2.h"
 #include "DetectBody.h"
 #include "ofxAutoReloadedShader.h"
 
@@ -65,7 +65,7 @@ public:
         shaderSplineReplace.setUniform2f("screenSize", (float)ofGetWidth(), (float)ofGetHeight());
     }
     
-    void update(ofxMultiKinectV2 *kinect, vector<Body> bodies){
+    void update(ofxKinectV2 *kinect, vector<Body> bodies){
         
         mesh.clear();
         int indx = 0;
@@ -76,9 +76,13 @@ public:
                 
                 if(indx%2 == 0){
                     
-                    float dist = kinect->getDistanceAt(ind->x, ind->y);
+                    //float dist = kinect->getDistanceAt(ind->x, ind->y);
                     
-                    ofVec3f pt = kinect->getWorldCoordinateAt(ind->y,ind->x,dist);
+                    ofVec3f pt = kinect->getWorldCoordinateAt(ind->x,ind->y);
+                    
+                    float swap = pt.x;
+                    pt.x = pt.y;
+                    pt.y = swap;
                     
                     pt.x += translateX;
                     pt.y += translateY;
@@ -91,6 +95,7 @@ public:
                     pt.z = y*sin(tilt)+z*cos(tilt);
                     
                     pt.x = ofGetWidth()-pt.x;
+                    pt.y = ofGetHeight()-pt.y;
                     
                     
                     // pt.set(x,y,dist);
@@ -137,7 +142,7 @@ public:
         shaderSplineReplace.end();
         ofDisablePointSprites();
         ofDisableBlendMode();
-        ofDisableAlphaBlending();
+        //ofDisableAlphaBlending();
         
         glDepthMask(GL_TRUE);
     }
@@ -150,8 +155,8 @@ public:
         return backgroundPix[x + y * backgroundPix.getWidth()] * 0.1; // mm to cm
     }
     
-    void setBackgroundSubstract(ofxMultiKinectV2 *kinect){
-        backgroundPix = kinect->getDepthPixelsRef();
+    void setBackgroundSubstract(ofxKinectV2 *kinect){
+        backgroundPix = kinect->getDepthPixels();
         // to avoid noise, reduce depth for some cm.
         for(int i = 0; i<backgroundPix.size(); i++){
             if(backgroundPix[i]>100){
@@ -161,9 +166,9 @@ public:
     }
     
     void fall(){
-        collapse += ofRandom(20);
+        collapse += ofRandom(60);
         vector<ofVec3f> p = mesh.getVertices();
-        float acc = 0.5;
+        float acc = 1.8;
         
         vel.resize(p.size());
         

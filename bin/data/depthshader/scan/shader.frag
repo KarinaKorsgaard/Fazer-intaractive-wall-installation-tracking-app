@@ -17,7 +17,7 @@ void main()
     vec3 text = tex.xyz;
     
     
-    vec3 defaultColor = vec3(1.,1.,1.);
+    vec3 defaultColor = vec3(1.);
     
     vec3 finalColor = defaultColor;
     float value = scanline/u_resolution.y;

@@ -14,10 +14,10 @@ void ofApp::setup(){
     ofTrueTypeFont::setGlobalDpi(72);
     scanImage.load("scan.png");
     // font.load("Roboto.ttf", 12, true, true);
-    font.load("Calibre-Regular.otf", 12, true, true);
+    font.load("Calibre/Calibre-Semibold.otf", 13, true, true);
     
     //csv----------------------------
-    csv.loadFile(ofToDataPath("csv/csv.csv"));
+    csv.loadFile(ofToDataPath("csv/csvALLCAPS.csv"));
     
     numDatapoints=csv.numRows-1;
     numActors = csv.numCols-1;
@@ -67,9 +67,9 @@ void ofApp::setup(){
     //csv----------------------------end
     
     
-    kinect.open(false, true, 0, 2); // GeForce on MacBookPro Retina
+    kinect.open(); // GeForce on MacBookPro Retina
     
-    kinect.start();
+    //kinect.start();
     
     pointCloud.setup();
     
@@ -96,11 +96,11 @@ void ofApp::setup(){
     pointCloudSetup.add(tilt.set("tilt", 0, -7, 7));
     pointCloudSetup.add(translateX.set("translateX", -512, -1000, 1000));
     pointCloudSetup.add(translateY.set("translateY", -512, -3000, 1000));
-    pointCloudSetup.add(translateZ.set("translateZ", -1000, -1000, 2000));
+    pointCloudSetup.add(translateZ.set("translateZ", -2000, -2000, 2000));
     
     testParams.setName("testParams");
-    testParams.add(test1.set("test1", 0, 0,300));
-    testParams.add(test2.set("test2", 0, 0, 300));
+    testParams.add(test1.set("test1", 0, 0,5));
+    testParams.add(test2.set("test2", 0, 0, 5));
     
     testParams.add(bPosXlow.set("bPosXlow", 0, 0, ofGetWidth()));
     testParams.add(thresX.set("thresX", 0, 0, ofGetWidth()));
@@ -117,22 +117,23 @@ void ofApp::setup(){
     
     gui.setup(paramters);
     gui.loadFromFile("settings.xml");
-    
+    syphon.setName("DAC Virtual Mirror");
     
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
-//    if(counter>30*5){
-//        kinect.close();
-//       
-//    }
-//    
-//    if(counter>30*10){
-//        kinect.open(false, true, 0, 2); // GeForce on MacBookPro Retina
-//        kinect.start();
-//    }
+    
+    if(counter>30*5){
+        kinect.close();
+       
+    }
+    
+    if(counter>30*10){
+        kinect.open(); // GeForce on MacBookPro Retina
+      
+    }
     
 //    if (!kinect.isFrameNew()) {
 //       
@@ -148,6 +149,7 @@ void ofApp::update(){
     pointCloud.floor = floor;
     
     detectPerson();
+    
     timeLine();
     
    
@@ -162,18 +164,13 @@ void ofApp::update(){
     //ofBackgroundGradient(ofColor(50), ofColor(0),OF_GRADIENT_CIRCULAR);
     ofBackground(0);
     ofSetColor(255);
-    //pointCloud.draw();
+    
 
     pointCloud.drawPSpline();
 
-    
-    
-    ofEnableBlendMode(OF_BLENDMODE_DISABLED);
     ofSetColor(255);
     
-   
-    
-    ofSetColor(255);
+
     
     
     renderPC.end();
@@ -191,9 +188,9 @@ void ofApp::update(){
             
             // kinect.getColorPixelsRef().allocate(1920, 1080, 3);
             
-            kinect.getDepthPixelsRef().allocate(512, 424, 1);
+            kinect.getRawDepthPixels().allocate(512, 424, 1);
             
-            depthTex.loadData(kinect.getDepthPixelsRef(), GL_LUMINANCE);
+            depthTex.loadData(kinect.getRawDepthPixels(), GL_LUMINANCE);
             depthTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
             
             depthFbo.allocate(512, 424, GL_R16);
@@ -241,6 +238,7 @@ void ofApp::update(){
     
     for(int i = 0; i< numActors;i++){
         actors[i]->update();
+        actors[i]->rect = &thePerson;
         for(int j = i+1; j< numActors;j++){
             actors[i]->checkCollision(actors[j]);
         }
@@ -269,12 +267,12 @@ void ofApp::draw(){
     ofFill();
     //    ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
     
+
+    
     renderPC.draw(0, 0);
     scanner.end();
     //renderPC.draw(0, 0);
     renderPC.getTexture().unbind();
-    
-    
     
     if(scanUp||freeze){
         for(int i = 0; i< numDatapoints;i++ ){
@@ -290,12 +288,17 @@ void ofApp::draw(){
     }
     
     
+    syphon.publishScreen();
+    
     if(bDebug){
         
         ofNoFill();
-        detectPerson();
-        ofDrawRectangle(bPosXlow, bPosYlow,thresX, thresY);
+       
         
+        ofDrawRectangle(bPosXlow+gui.getWidth(), bPosYlow,thresX, thresY);
+        if(detectBody.getbodys().size()>0){
+        ofDrawEllipse(detectBody.getbodys()[0].centroid.x + +gui.getWidth(), detectBody.getbodys()[0].centroid.y,20,20);
+        }
         
         detectBody.drawProcess(10, 300, 512/2, 424/2, imgIndx);
         detectBody.drawOverlay(10, 300, 512/2, 424/2);
@@ -331,7 +334,7 @@ void ofApp::draw(){
         
         ofSetWindowTitle("FrameRate: "+ ofToString(ofGetFrameRate()));
         ofSetColor(255,0,0);
-        font.drawString(ofToString(counter),300,200);
+        font.drawString("frameNum since last update from Kinect:"+ofToString(counter),gui.getWidth()+10,20);
         
     }
     
@@ -343,12 +346,12 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 
 
-float ofApp::getAvgDepth(ofRectangle space, ofxMultiKinectV2 *kinect){
+float ofApp::getAvgDepth(ofRectangle space, ofxKinectV2 *kinect){
     int div = 0;
     float avgDepth = 5000;
     for(int y = space.y; y < space.y+space.height; y ++) {
         for(int x = space.x; x < space.x+space.width; x ++) {
-            avgDepth += kinect->getDistanceAt(x, y);
+          //  avgDepth += kinect->getDistanceAt(x, y);
             div++;
             //            float dist = kinect->getDistanceAt(x, y);
             //            if (dist < avgDepth && dist > 150) avgDepth = dist;
@@ -373,14 +376,7 @@ void ofApp::keyPressed(int key){
     if(key == 'b'){
         pointCloud.setBackgroundSubstract(&kinect);
     }
-    
-    if(key == 'r'){
-        
-        kinect.close();
-        
-        kinect.open(false,true,0,2);
-        kinect.start();
-    }
+
     
     
     if(key == '1') {
@@ -495,7 +491,7 @@ void ofApp::positions(){
         int stepY = sqrt((h*h) / numDatapoints);
         //float scale = contourPoly[0].getArea()/100;
         
-        int dp = ofRandom(numDatapoints);
+        int dp = ofRandom(1,numDatapoints-1);
         
         vector<int>dpRandom;
         
@@ -544,11 +540,7 @@ void ofApp::positions(){
                             breakWhile = true;
                         }
                     }
-                    
-                        
-                    
-//                    dp ++;
-//                    dp = dp%numDatapoints;
+
                 }
             }
         }
@@ -568,17 +560,34 @@ void ofApp::detectPerson(){
                detectBody.getbodys()[0].centroid.y <bPosYlow+thresY
                ){
                 isPersonPresent = true;
-            }else{
-                isPersonPresent = false;
                 
+                cv::Mat contourPCMat;
+                contourPCMat = cv::Mat::zeros( cvSize(ofGetWidth(),ofGetHeight()), CV_8U );
+                ofPixels imagePC;
+                renderPC.readToPixels(imagePC);
+                ofxCv::toCv(imagePC).convertTo(contourPCMat, CV_8UC1);
+                
+                int closingNum = 10;
+                bitwise_not(contourPCMat, contourPCMat);
+                erode(contourPCMat, contourPCMat, cv::Mat(), cv::Point(-1,-1), closingNum);
+                bitwise_not(contourPCMat, contourPCMat);
+                ofxCv::ContourFinder contourFindPC;
+                contourFindPC.setSortBySize(true);
+                contourFindPC.findContours(contourPCMat);
+                
+                if(contourFindPC.getPolylines().size()>0){
+                    
+                    contourPC = contourFindPC.getPolyline(0);
+                    thePerson = ofRectangle(contourPC.getBoundingBox().x,contourPC.getBoundingBox().y, contourPC.getBoundingBox().width, contourPC.getBoundingBox().height);
+                }
             }
             
+            else{
+                isPersonPresent = false;
+                thePerson  = ofRectangle(0,0,0,0);
+            }
             
         }
-        if(bDebug){
-            ofDrawEllipse(detectBody.getbodys()[0].centroid,20,20);
-        }
-        
     }
 }
 //--------------------------------------------------------------

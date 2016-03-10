@@ -148,7 +148,7 @@ void DetectBody::update(cv::Mat image)
         Mat depthImageCanny = Mat::zeros( cvSize(width,height), CV_8UC1 );
         
         
-        Canny(depthImage, depthImageCanny, test1,test2, 3); // for K:V2 130, 100, 3);
+        Canny(depthImage, depthImageCanny, 27,79, 3); // for K:V2 130, 100, 3);
         
         dilate(depthImageCanny, depthImageCanny, cv::Mat(), cv::Point(-1,-1), 2);
         erode(depthImageCanny, depthImageCanny, cv::Mat(), cv::Point(-1,-1), 1);
