@@ -11,6 +11,9 @@
 #include "DetectBody.h"
 #include "ofxAutoReloadedShader.h"
 
+#define RES_HEIGHT 1280
+#define RES_WIDTH 800
+
 class PointCloud{
     
 public:
@@ -45,12 +48,12 @@ public:
         
         texSpline.allocate(128,128, GL_RGBA);
         
-        renderer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);//A32F_ARB);
-        renderer.begin();
-        ofClear(255,255,255, 0);
-        // load the texure
-        ofEnableSmoothing();
-        renderer.end();
+//        renderer.allocate(RES_WIDTH, RES_HEIGHT, GL_RGBA);//A32F_ARB);
+//        renderer.begin();
+//        ofClear(255,255,255, 0);
+//        // load the texure
+//        ofEnableSmoothing();
+//        renderer.end();
         
         //ofDisableArbTex();
         ofDisableArbTex();
@@ -62,7 +65,7 @@ public:
         // shaderSplineReplace.setupShaderFromSource(GL_VERTEX_SHADER, splineReplaceShader);
         // shaderSplineReplace.linkProgram();
         shaderSplineReplace.load("shaders/shader");
-        shaderSplineReplace.setUniform2f("screenSize", (float)ofGetWidth(), (float)ofGetHeight());
+        shaderSplineReplace.setUniform2f("screenSize", (float)RES_WIDTH, (float)RES_HEIGHT);
     }
     
     void update(ofxKinectV2 *kinect, vector<Body> bodies){
@@ -94,8 +97,8 @@ public:
                     pt.y = y*cos(tilt)-z*sin(tilt);
                     pt.z = y*sin(tilt)+z*cos(tilt);
                     
-                    pt.x = ofGetWidth()-pt.x;
-                    pt.y = ofGetHeight()-pt.y;
+                    pt.x = RES_WIDTH-pt.x;
+                    pt.y = RES_HEIGHT-pt.y;
                     
                     
                     // pt.set(x,y,dist);
@@ -166,9 +169,9 @@ public:
     }
     
     void fall(){
-        collapse += ofRandom(60);
+        collapse += ofRandom(140);
         vector<ofVec3f> p = mesh.getVertices();
-        float acc = 1.8;
+        float acc = 2.8;
         
         vel.resize(p.size());
         

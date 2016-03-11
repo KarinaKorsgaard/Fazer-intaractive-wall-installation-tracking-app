@@ -13,6 +13,9 @@
 
 #include "Body.h"
 
+#define RES_HEIGHT 1280
+#define RES_WIDTH 800
+
 
 class DetectBody
 {

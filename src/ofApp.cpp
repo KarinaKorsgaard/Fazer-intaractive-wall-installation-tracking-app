@@ -8,6 +8,8 @@ using namespace cv;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    resetAll = true;
+    
     ofSetVerticalSync(true);
     ofSetFrameRate(30);
     
@@ -15,7 +17,10 @@ void ofApp::setup(){
     scanImage.load("scan.png");
     // font.load("Roboto.ttf", 12, true, true);
     font.load("Calibre/Calibre-Semibold.otf", 13, true, true);
-    
+    mainRender.allocate(800,1280);
+    mainRender.begin();
+    ofClear(0);
+    mainRender.end();
     //csv----------------------------
     csv.loadFile(ofToDataPath("csv/csvALLCAPS.csv"));
     
@@ -30,15 +35,24 @@ void ofApp::setup(){
         actors[i-1] = new Actor;
         string name = csv.getString(0, i);
         actors[i-1]->Name = name;
+        string str;
         
-        string str = "logo/"+name+".png";
-        if(ofIsStringInString(name, "TWITTER")){
-            str = "logo/TWITTER.png";
-        }
+            str = "logo/"+name+".png";
+            if(ofIsStringInString(name, "TWITTER")){
+                str = "logo/TWITTER.png";
+            }
+        actors[i-1]->img.load(str);
+        
+        string str2;
+            str2 = "logo/UC/"+name+".png";
+            if(ofIsStringInString(name, "TWITTER")){
+                str2 = "logo/UC/TWITTER.png";
+            }
+        actors[i-1]->img2.load(str2);
         
         actors[i-1]->img.load(str);
-        actors[i-1]->pos.x = ofRandom(ofGetWidth());
-        actors[i-1]->pos.y = ofRandom(ofGetHeight());
+        actors[i-1]->pos.x = ofRandom(RES_WIDTH);
+        actors[i-1]->pos.y = ofRandom(RES_HEIGHT);
         
         //actors[i-1]->size = ofRandom(50,100);
         actors[i-1]->vel = ofVec2f(0,0);
@@ -51,15 +65,15 @@ void ofApp::setup(){
         datapoints[i-1] = new DataPoint;
         string name = csv.getString(i, 0);
         datapoints[i-1]->Name = name;
-        datapoints[i-1]->pos.x = ofRandom(ofGetWidth());
-        datapoints[i-1]->pos.y = ofRandom(ofGetHeight());
+        datapoints[i-1]->pos.x = ofRandom(RES_WIDTH);
+        datapoints[i-1]->pos.y = ofRandom(RES_HEIGHT);
         
         for(int u=1; u<csv.numCols; u++) {
             int value = csv.getInt(i, u);
             if(value == 1){
                 datapoints[i-1]->connections.push_back(actors[u-1]);
                 actors[u-1]->size+=2;
-                actors[u-1]->orgSize+=2;
+                
             }
         }
         datapoints[i-1]->font = &font;
@@ -78,8 +92,8 @@ void ofApp::setup(){
     
     depthShader.load("depthshader/shader");
     scanner.load("depthshader/scan/shader");
-    renderPC.allocate(ofGetWidth(),ofGetHeight());
-    scanRender.allocate(ofGetWidth(),ofGetHeight());
+    renderPC.allocate(RES_WIDTH,RES_HEIGHT);
+    scanRender.allocate(RES_WIDTH,RES_HEIGHT);
     
     // Setup GUI
     imageSetup.setName("imageSetup");
@@ -102,11 +116,11 @@ void ofApp::setup(){
     testParams.add(test1.set("test1", 0, 0,5));
     testParams.add(test2.set("test2", 0, 0, 5));
     
-    testParams.add(bPosXlow.set("bPosXlow", 0, 0, ofGetWidth()));
-    testParams.add(thresX.set("thresX", 0, 0, ofGetWidth()));
+    testParams.add(bPosXlow.set("bPosXlow", 0, 0, RES_WIDTH));
+    testParams.add(thresX.set("thresX", 0, 0, RES_WIDTH));
     
-    testParams.add(bPosYlow.set("bPosYlow", 0, 0, ofGetHeight()));
-    testParams.add(thresY.set("thresY", 0, 0, ofGetHeight()));
+    testParams.add(bPosYlow.set("bPosYlow", 0, 0, RES_HEIGHT));
+    testParams.add(thresY.set("thresY", 0, 0, RES_HEIGHT));
     
     testParams.add(floor.set("floor", 0, -8000, 8000));
     
@@ -119,6 +133,7 @@ void ofApp::setup(){
     gui.loadFromFile("settings.xml");
     syphon.setName("DAC Virtual Mirror");
     
+    
 }
 
 //--------------------------------------------------------------
@@ -130,8 +145,9 @@ void ofApp::update(){
        
     }
     
-    if(counter>30*10){
+    if(counter>30*10 && !kinect.isThreadRunning()){
         kinect.open(); // GeForce on MacBookPro Retina
+        sleep(300);
       
     }
     
@@ -251,21 +267,21 @@ void ofApp::update(){
 void ofApp::draw(){
     
     //renderPC.draw(0,0);
-    
-    
+    mainRender.begin();
+    ofClear(0);
     renderPC.getTexture().bind();
     
     scanner.begin();
     
     
     
-    scanner.setUniform2f("u_resolution", ofGetWidth(),ofGetHeight());
-    scanner.setUniform1f("scanline", ofGetHeight()-scanLine);
+    scanner.setUniform2f("u_resolution", 800.,1280.);
+    scanner.setUniform1f("scanline", 1280.-scanLine);
     // scanner.setUniformTexture("tex", renderPC.getTexture(),0);
     
     ofSetColor(255);
     ofFill();
-    //    ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
+    //    ofDrawRectangle(0,0,RES_WIDTH,RES_HEIGHT);
     
 
     
@@ -284,11 +300,24 @@ void ofApp::draw(){
     }
     
     for(int i = 0; i<numActors;i++ ){
+        if(circleLogo){
         actors[i]->draw();
+        }else{
+        actors[i]->drawUC();
+        }
+        
     }
     
+    mainRender.end();
+    mainRender.draw(0,0);
+    ofSetColor(255);
+    ofFill();
     
-    syphon.publishScreen();
+    ofFill();
+    syphon.publishTexture(&mainRender.getTexture());
+    
+    
+    
     
     if(bDebug){
         
@@ -318,7 +347,7 @@ void ofApp::draw(){
                                    "a - add sample\n" +
                                    "s - save expressions\n"
                                    "l - load expressions",
-                                   14, ofGetHeight() - 10 * 12);
+                                   14, RES_HEIGHT - 10 * 12);
         
         ofxCv::drawHighlightString(string() +
                                    "index of the detection Image\n" +
@@ -329,7 +358,7 @@ void ofApp::draw(){
                                    "5 armEdges\n" +
                                    "6 activeAreaMask\n" +
                                    "7 inputImage\n",
-                                   14*15, ofGetHeight() - 10 * 12);
+                                   14*15, RES_HEIGHT - 10 * 12);
         
         
         ofSetWindowTitle("FrameRate: "+ ofToString(ofGetFrameRate()));
@@ -406,6 +435,9 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
+    if(key == 's'){
+        circleLogo = !circleLogo;
+    }
     
 }
 
@@ -465,7 +497,7 @@ void ofApp::positions(){
     }
     
     cv::Mat contourPCMat;
-    contourPCMat = cv::Mat::zeros( cvSize(ofGetWidth(),ofGetHeight()), CV_8U );
+    contourPCMat = cv::Mat::zeros( cvSize(RES_WIDTH,RES_HEIGHT), CV_8U );
     ofPixels imagePC;
     renderPC.readToPixels(imagePC);
     ofxCv::toCv(imagePC).convertTo(contourPCMat, CV_8UC1);
@@ -483,64 +515,63 @@ void ofApp::positions(){
         contourPC = contourFindPC.getPolyline(0);
         
         
-        int h = contourPC.getBoundingBox().height/2;
-        int w = contourPC.getBoundingBox().width/2;
-        int a = contourPC.getArea();
+        int h = contourPC.getBoundingBox().height/3;
+        int w = contourPC.getBoundingBox().width/5;
+       //int a = contourPC.getArea();
         
-        int stepX = sqrt((w*w) / numDatapoints);
-        int stepY = sqrt((h*h) / numDatapoints);
+        int stepX = 1;//sqrt((w*w) / numDatapoints);
+        int stepY = 25;//sqrt((h*h) / numDatapoints);
         //float scale = contourPoly[0].getArea()/100;
         
         int dp = ofRandom(1,numDatapoints-1);
+        int stepXThis = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width/2;
         
         vector<int>dpRandom;
         
-        int step =1;
+        //int step =1;
         //min step in y so they dont overlap
-        if(stepY<20){stepY = 20;}
-        for(int y = 0 ; y < ofGetHeight() ; y+=stepY){
+        //if(stepY<30){stepY = 30;}
+        
+        for(int y = 0 ; y < RES_HEIGHT ; y+=stepY){
             
             
             
-            step = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width+20;
-            if(stepX<step){stepX = step;}
-            
-            for(int x = 0 ; x < ofGetWidth() ; x+=stepX){
+            //if(stepX<step){stepX = step;}
+            //stepX = step;
+            for(int x = 0 ; x < RES_WIDTH ; x+= stepX + stepXThis){
+                
+                stepXThis = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width;
                 
                 ofPoint p = ofPoint(x,y);
-                
                 if(contourPC.inside(p)){
-                    
-                    
-                    
+
                     datapoints[dp]->pos.x = x;
-                    if(dp%2==0){
-                        datapoints[dp]->pos.y = y + stepY/2;
-                    }else{
-                        datapoints[dp]->pos.y = y;
-                    }
+                    datapoints[dp]->pos.y = y;
                     datapoints[dp]->isSet = true;
+                    
                     
                     
                     dpRandom.push_back(dp);
                     
                     bool breakWhile = false;
-                    
-                    while(!breakWhile){
-                        
-                        dp = ofRandom(numDatapoints);
-                        
-                        bool found = true;
-                        for(int i = 0; i < dpRandom.size();i++){
-                            if(dp == dpRandom[i]){
-                                found = false;
+                    if(dpRandom.size() < numDatapoints){
+                        while(!breakWhile){
+                            
+                            dp = ofRandom(numDatapoints);
+                            
+                            bool found = true;
+                            for(int i = 0; i < dpRandom.size();i++){
+                                if(dp == dpRandom[i]){
+                                    found = false;
+                                }
                             }
-                        }
-                        if(found){
-                            breakWhile = true;
+                            if(found ){
+                                breakWhile = true;
+                            }
+                            
                         }
                     }
-
+                    stepX = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width;
                 }
             }
         }
@@ -562,7 +593,7 @@ void ofApp::detectPerson(){
                 isPersonPresent = true;
                 
                 cv::Mat contourPCMat;
-                contourPCMat = cv::Mat::zeros( cvSize(ofGetWidth(),ofGetHeight()), CV_8U );
+                contourPCMat = cv::Mat::zeros( cvSize(RES_WIDTH,RES_HEIGHT), CV_8U );
                 ofPixels imagePC;
                 renderPC.readToPixels(imagePC);
                 ofxCv::toCv(imagePC).convertTo(contourPCMat, CV_8UC1);
@@ -609,11 +640,11 @@ void ofApp::timeLine(){
     // if scanline is down, scan go up.
     if(scanDown){
 
-        float x = abs (scanLine - ofGetHeight())/100;
+        float x = abs (scanLine - RES_HEIGHT)/100;
         //  scanLine = scanLine*scanLine  ;
         // cout<< scanLine <<endl;
-        scanLine +=5;
-        if(scanLine > ofGetHeight()){
+        scanLine +=15;
+        if(scanLine > RES_HEIGHT){
             scanUp = true;
             scanDown = false;
             positions();
@@ -629,14 +660,14 @@ void ofApp::timeLine(){
     // scan up- set datapoints positions, freese PC (updatePC) // when up, keep datapoints (freeze)
     if(scanUp){
         updatePC = false;
-        float x = abs (ofGetHeight() - scanLine)/100;
+        float x = abs (RES_HEIGHT - scanLine)/100;
         scanLine -=5;
         if(scanLine < 0){
             scanUp = false;
             freeze = true; // let dataPoints stay even if scanUp = false
             ending = true;
             pointCloud.vel.clear();
-            pointCloud.collapse = ofGetHeight()/2;
+            pointCloud.collapse = RES_HEIGHT/2;
             
         }
     }
@@ -654,6 +685,10 @@ void ofApp::timeLine(){
     if(startFall){
         lastTimer ++;
         pointCloud.fall();
+        
+        for(int i = 0; i< numActors;i++){
+            actors[i]->hasConnection = false;
+        }
         for(int i = 0; i<numDatapoints;i++){
             datapoints[i]->fall=true;
         }

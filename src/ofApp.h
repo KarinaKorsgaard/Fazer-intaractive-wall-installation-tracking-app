@@ -10,6 +10,9 @@
 #include "ofxGui.h"
 #include "ofxCsv.h"
 
+#define RES_HEIGHT 1280
+#define RES_WIDTH 800
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -33,6 +36,8 @@ class ofApp : public ofBaseApp{
     void positions();
     void detectPerson();
     void timeLine();
+    
+    int theHeigth = 1280;
     
     ofPolyline contourPC;
     ofTrueTypeFont font;
@@ -87,7 +92,7 @@ class ofApp : public ofBaseApp{
     
     int scanLineHeight = 100;
     
-    
+    bool circleLogo = false;
     
     int counter = 0;
     
@@ -123,6 +128,8 @@ class ofApp : public ofBaseApp{
     ofParameter<int>   floor;
     
     ofRectangle thePerson;
+    
+    ofFbo mainRender; 
     
     
    

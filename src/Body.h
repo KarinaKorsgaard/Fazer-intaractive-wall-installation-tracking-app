@@ -9,6 +9,9 @@
 #include "ofMain.h"
 #include "ofxCV.h"
 
+#define RES_HEIGHT 1280
+#define RES_WIDTH 800
+
 //#include "ofxCvMin.h"
 
 class Body
@@ -55,20 +58,18 @@ public:
     ofVec2f vel;
     float size = 50;
     ofImage img;
+    ofImage img2;
     ofColor color;
     ofTrueTypeFont *font;
-    bool pulse;
-    int pulsingTimer;
-    int pulsingTimerThres = 180;
-    float orgSize = 50;
-    bool amPulsing = false;
+
     int counter = 0;
     bool hasConnection = false;
-    bool red;
+    
+    int alpha =0;
     ofRectangle *rect = new ofRectangle;
     
     float friction = -0.98;
-    float gravity = -0.02;
+    float gravity = 0;//-0.02;
     float spring = 0.03;
   
     void checkCollision(Actor *ofActor){
@@ -115,61 +116,75 @@ public:
             vel*=friction;
             
         }
-        if(pos.x > ofGetWidth()-size/2 && pos.y < size/2){
+        if(pos.x > RES_WIDTH-size/2 && pos.y < size/2){
             vel.set(-1,1);
         }
         if(pos.x < size/2 && pos.y < size/2){
             vel.set(1,1);
         }
         
-        if(pos.x>ofGetWidth()-size/2){
-            pos.x= ofGetWidth()-size/2;
+        if(pos.x>RES_WIDTH-size/2){
+            pos.x= RES_WIDTH-size/2;
             vel*=friction;
-            if(vel.length() <0.5){
-                vel *= 1.2;
-            }
+
         }
         if(pos.x<size/2){
             pos.x= size/2;
             vel*=friction;
-            if(vel.length() <0.5){
-                vel *= 1.2;
-            }
+
 
         }
-        if(pos.y>ofGetHeight()-size/2){
-            pos.y= ofGetHeight()-size/2;
+        if(pos.y>RES_HEIGHT-size/2){
+            pos.y= RES_HEIGHT-size/2;
             vel*=-1;
-            if(vel.length() <0.5){
-                vel *= 1.2;
-            }
+
 
         }
         if(pos.y<size/2){
             pos.y= size/2;
             vel*=friction;
-            if(vel.length() <0.5){
-                vel *= 1.2;
-            }
+
+        }
+        if(vel.length() <0.5){
+            vel *= 1.2;
         }
         
-        if(pos.y>ofGetHeight()/2){
+        if(pos.y>RES_HEIGHT/2){
             vel.y += gravity;
         }
         pos+=vel;
+        
+        if(hasConnection && alpha < 230){
+            alpha +=5;
+        }else if(!hasConnection && alpha >0){
+            alpha -=5;
+        }
 
         
     }
+    void drawUC(){
+       
+            float w = size;
+            float h = size*(img2.getHeight()/img2.getWidth());
+            //int ratio = w/h;
+            ofSetColor(255,alpha);
+            img2.draw(pos.x-w/2,pos.y-h/2,w,h);
+            // ofSetColor(255);
+            // font->drawString(Name,pos.x-size/2,pos.y+size/2);
+        
+    }
+
 
     void draw(){
-
-        float w = size;
-        float h = size*(img.getHeight()/img.getWidth());
-        //int ratio = w/h;
-        ofSetColor(255);
-        img.draw(pos.x-w/2,pos.y-h/2,w,h);
-       // ofSetColor(255);
-       // font->drawString(Name,pos.x-size/2,pos.y+size/2);
+    
+            float w = size;
+            float h = size*(img.getHeight()/img.getWidth());
+            //int ratio = w/h;
+            ofSetColor(255,alpha);
+            img.draw(pos.x-w/2,pos.y-h/2,w,h);
+            // ofSetColor(255);
+            // font->drawString(Name,pos.x-size/2,pos.y+size/2);
+        
     };
 };
 
@@ -213,11 +228,29 @@ public:
         }
 
         if(tl>=0){
+            
+            ofFill();
+            
+            //ofDrawBitmapString(Name, posX, posY);
+            
+            ofSetColor(0,tl*200);
+            ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
+            ofRectangle myRect;
+            myRect.x = pos.x-6-rect.width+40;
+            myRect.y = pos.y-6-rect.height;
+            myRect.width = rect.width+12;
+            myRect.height = rect.height+12;
+            
+            ofDrawRectRounded(myRect, 5);
+            
+            ofSetColor(255,tl*255);
+            font->drawString(Name,pos.x-rect.width+40,pos.y);
+            
             for(int i = 0; i<connections.size();i++){
                 
                 //float dist = ofDist(posX,posY,connections[i].posX,connections[i].posY);
                 
-                ofVec2f a = pos;
+                ofVec2f a; a.set(pos.x-(rect.width+40)/2, pos.y);
                 ofVec2f b = connections[i]->pos;
                 ofVec2f c = (b - a)*tl+a;
                 ofVec2f d = (b - a)*shooter/100+a;
@@ -227,27 +260,12 @@ public:
                 ofDrawEllipse(d.x,d.y,1,1);
                 // ofDrawEllipse(e.x,e.y,2,2);
                 
-                //connections[i]->hasConnection = true;
+                connections[i]->hasConnection = true;
                 ofSetColor(255,tl*100);
                 ofSetLineWidth(0.5);
                 ofDrawLine(pos,c);
             }
-            ofFill();
-            
-            //ofDrawBitmapString(Name, posX, posY);
-            
-            ofSetColor(0,tl*200);
-            ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
-            ofRectangle myRect;
-            myRect.x = pos.x-6-rect.width/2;
-            myRect.y = pos.y-6-rect.height;
-            myRect.width = rect.width+12;
-            myRect.height = rect.height+12;
-            
-            ofDrawRectRounded(myRect, 5);
-            
-            ofSetColor(255,tl*255);
-            font->drawString(Name,pos.x-rect.width/2,pos.y);
+
             
         }
     };

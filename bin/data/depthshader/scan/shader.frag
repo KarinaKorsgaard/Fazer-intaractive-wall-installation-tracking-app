@@ -20,7 +20,7 @@ void main()
     vec3 defaultColor = vec3(1.);
     
     vec3 finalColor = defaultColor;
-    float value = scanline/u_resolution.y;
+    float value = (u_resolution.y-scanline)/u_resolution.y;
     vec2 aniuv = uv - value;
     finalColor *= abs (0.05 / sin((aniuv.y)) * .10 ) + 0.0;
 
