@@ -190,14 +190,16 @@ public:
     // float posX,posY,posZ;
     vector<Actor*>connections;
     bool isSet;
-    float tl;
     float mover = 0;
-    bool con = false;
-    bool addPower;
+    
     int shooter;
     bool drawLines = true;
     bool fall = false;
+    
     bool alpha = false;
+    bool length = false;
+    float tlAlpha;
+    float tlLength;
     
     ofVec2f att;
     ofTrueTypeFont *font;
@@ -205,60 +207,63 @@ public:
     
     void draw(){
         
-        if(fall){
-            tl-=0.01;
-            con = false;
-        }
-        
         shooter++;
         shooter = shooter%100;
         
-
-        if(alpha && tl<0.95){
-            tl+=0.01;
-            addPower = true;
+        //alpha counter
+        if(alpha && tlAlpha<0.95){
+            tlAlpha+=0.01;
+        }
+        
+        //start line length counter
+        if(length && tlLength<0.95){
+            tlLength+=0.01;
         }
 
-        if(tl>=0){
-            
+        if(tlAlpha>=0){
+            // draw dataPoints_
             ofFill();
-            
-            //ofDrawBitmapString(Name, posX, posY);
-            
-            ofSetColor(0,tl*200);
+            ofSetColor(0,tlAlpha*200);
             ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
             ofRectangle myRect;
             myRect.x = pos.x-6-rect.width+40;
             myRect.y = pos.y-6-rect.height;
             myRect.width = rect.width+12;
             myRect.height = rect.height+12;
-            
             ofDrawRectRounded(myRect, 5);
-            
-            ofSetColor(255,tl*255);
+            ofSetColor(255,tlAlpha*255);
             font->drawString(Name,pos.x-rect.width+40,pos.y);
+            // draw dataPoints_end
             
-            for(int i = 0; i<connections.size();i++){
-                
-                //float dist = ofDist(posX,posY,connections[i].posX,connections[i].posY);
-                
-                ofVec2f a; a.set(pos.x-(rect.width+40)/2, pos.y);
-                ofVec2f b = connections[i]->pos;
-                ofVec2f c = (b - a)*tl+a;
-                ofVec2f d = (b - a)*shooter/100+a;
-                //  ofVec2f e = (a - b)*shooter/1000+b;
-                
-                ofSetColor(20,255,20);
-                ofDrawEllipse(d.x,d.y,1,1);
-                // ofDrawEllipse(e.x,e.y,2,2);
-                if(con){
+            // draw lines if con. con = true if scanLine is all up.
+            if(length){
+                for(int i = 0; i<connections.size();i++){
+                    // start drawing the actors
                     connections[i]->hasConnection = true;
-                
+                    
+                    ofVec2f a; a.set(pos.x-(rect.width+40)/2, pos.y);
+                    ofVec2f b = connections[i]->pos;
+                    ofVec2f c = (b - a)*tlLength+a;
+                    ofVec2f d = (b - a)*shooter/100+a;
+
+                    ofSetColor(20,255,20);
+                    ofDrawEllipse(d.x,d.y,1,1);
+                    // ofDrawEllipse(e.x,e.y,2,2);
+                    
+                    ofSetColor(255,tlAlpha*100);
+                    ofSetLineWidth(0.5);
+                    ofDrawLine(pos,c);
                 }
-                ofSetColor(255,tl*100);
-                ofSetLineWidth(0.5);
-                ofDrawLine(pos,c);
             }
+            
+            if(fall){
+                //length
+                tlLength-=0.01;
+                tlAlpha-=0.01;
+                length = false;
+                alpha = false;
+            }
+            
             
         }
     };

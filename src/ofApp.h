@@ -95,6 +95,7 @@ class ofApp : public ofBaseApp{
     //close/open kinect counter. Does not work
     int counter = 0;
     
+    ofPolyline getBodyPoly();
     
     // GUI / Controlpanel
     ofxPanel gui;
