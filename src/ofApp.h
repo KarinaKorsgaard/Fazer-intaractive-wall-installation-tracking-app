@@ -37,8 +37,6 @@ class ofApp : public ofBaseApp{
     void detectPerson();
     void timeLine();
     
-    int theHeigth = 1280;
-    
     ofPolyline contourPC;
     ofTrueTypeFont font;
     ofxKinectV2 kinect;
@@ -50,6 +48,8 @@ class ofApp : public ofBaseApp{
     ofxAutoReloadedShader depthShader;
     ofxAutoReloadedShader scanner;
     ofFbo depthFbo;
+    
+    
     ofFbo scanRender;
     ofFbo renderPC;
     DataPoint** datapoints;
@@ -63,7 +63,6 @@ class ofApp : public ofBaseApp{
     int bot = ofGetWidth();
     int imgIndx = 0;
     
-    int setPoints;
 
    // ofPixels colorPix;
     
@@ -87,16 +86,15 @@ class ofApp : public ofBaseApp{
     bool startFall = false;
     int lastTimer = 0;
     int lastTimerThres = 200;
+    int scanLineHeight = 100;
     
     bool bDebug = true;
     
-    int scanLineHeight = 100;
-    
     bool circleLogo = false;
     
+    //close/open kinect counter. Does not work
     int counter = 0;
     
-   // vector<ofPolyline> contourPoly;
     
     // GUI / Controlpanel
     ofxPanel gui;

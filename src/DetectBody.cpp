@@ -45,74 +45,12 @@ void DetectBody::setup( int _w, int _h, int _nearThreshold, int _farThreshold)
     }else{
         createGenericMask();
     }
-    
-    
-//    cv::Mat gradient = cv::Mat::zeros( cvSize(width,height), CV_8U );
-//    for(int x=0; x<gradient.cols; x++)
-//    {
-//        if(x>=top && x<=edge){
-//            float i = (float)(x-top)/(edge-top);
-//            float val = i*(edgeDepth-topDepth)+topDepth;
-//            for(int y=0; y<gradient.rows; y++)
-//            {
-//                gradient.at<char>(y,x) = (int)val;
-//            }
-//            //fma(t, edgeDepth, fma(-t, topDepth, topDepth));
-//        }else if(x>edge && x<=bot){
-//            float i = (float)(x-edge)/(width-edge);
-//            float val = i*(botDepth-edgeDepth)+edgeDepth;
-//            for(int y=0; y<gradient.rows; y++)
-//            {
-//                gradient.at<char>(y,x) = (int)val;
-//            }
-//        }
-//    }
-    
-
 }
 
 void DetectBody::update(cv::Mat image)
 {
     image.convertTo(depthImage, CV_8UC1);
     
-    //depthImage.copyTo(inputImage);
-    
-    
-//    for(int x=0; x<depthImage.cols; x++){
-//        
-//        if(x>=top && x<=edge){
-//            float i = (float)(x-top)/(edge-top);
-//            float val = i*(edgeDepth-topDepth)+topDepth;
-//            
-//            for(int y=0; y<depthImage.rows; y++)
-//            {
-//                if(depthImage.at<char>(y,x) < (int)val) depthImage.at<char>(y,x) = 0;
-//            }
-//            
-//        }else if(x>edge && x<=bot){
-//            float i = (float)(x-edge)/(width-edge);
-//            float val = i*(botDepth-edgeDepth)+edgeDepth;
-//            
-//            for(int y=0; y<depthImage.rows; y++)
-//            {
-//                if(depthImage.at<char>(y,x) < (int)val) depthImage.at<char>(y,x) = 0;
-//            }
-//        }
-//        
-//    }
-    
-    //cut Far and Near
-//    threshold(depthImage, depthImage, 255-farThreshold, 0, THRESH_TOZERO);
-//    threshold(depthImage, depthImage, 255-nearThreshold, 0, THRESH_TOZERO_INV);
-    
-//    for(int x=0; x<depthImage.cols; x++){
-//        for(int y=0; y<depthImage.rows; y++){
-//           
-//            if(depthImage.at<int>(y,x) < gradient.at<int>(y,x)){
-//                depthImage.at<int>(y,x) = 0;
-//            }
-//        }
-//    }
     
     depthImage.copyTo(inputImage);
     
@@ -212,74 +150,21 @@ void DetectBody::update(cv::Mat image)
     if(bodys.size()>0){
         for(vector<Body>::iterator b=bodys.begin(); b!=bodys.end(); b++)
         {
-            // Find base of each arm
             
-           // bodys[i].armBase = findArmBase(dilatedTableEdges, body);
+            b->indices.clear();
             
-//            bool rightRatio = (b->boundaryPoly.getBoundingBox().width > b->boundaryPoly.getBoundingBox().height);
-//            //bool centerAboveMid = b->centroid.y > b->boundaryPoly.getBoundingBox().height / 2;
-//            
-//            if(!rightRatio){
-//                
-//                bodys.erase(b);
-//                
-//            }
-            
-         //   else {
-                b->indices.clear();
-                
-                for(int y=0; y<b->bodyBlob.rows; y++)
+            for(int y=0; y<b->bodyBlob.rows; y++)
+            {
+                for(int x=0; x<b->bodyBlob.cols; x++)
                 {
-                    for(int x=0; x<b->bodyBlob.cols; x++)
+                    if(b->bodyBlob.at<bool>(y, x))
                     {
-                        if(b->bodyBlob.at<bool>(y, x))
-                        {
-                            b->indices.push_back(ofVec2f(x, y));
-                            //indices.data[indices.size] = Point2Di(x, y);
-                            //indices.size++;
-                        }
+                        b->indices.push_back(ofVec2f(x, y));
+                        //indices.data[indices.size] = Point2Di(x, y);
+                        //indices.size++;
                     }
                 }
-        //    }
-            
-            //  }
-            // Calculate the center of geometry -> allready done in getbodysBoundaries
-            
-            /*ofVec2f center;
-             for(size_t j=0; j<bodys[i].boundary.size(); j++){
-             center.operator+=(bodys[i].boundary[j]);
-             }
-             center.x = (int)(center.x / bodys[i].boundary.size());
-             center.y = (int)(center.y / bodys[i].boundary.size());
-             */
-            
-            
-            // Calculate mean depth and area and palm center
-            
-            /*   // Get arm blob
-             static BinaryImage armBlob;
-             bodys[i].CreateArmBlob(armBlob);
-             
-             // Get arm blob indices
-             static Types<Point2Di>::FlatImage armBlobIndices;
-             Util::Helpers::GetBlobIndices(armBlob, armBlobIndices);
-             
-             // Calculate mean depth
-             float depth = 0;
-             for(size_t j=0; j<armBlobIndices.size; j++)
-             {
-             Point2Di point = armBlobIndices.data[j];
-             depth += depthImageF.data[point.y][point.x];
-             }
-             depth /= armBlobIndices.size;
-             
-             bodys[i].meanDepth = depth;
-             bodys[i].area = armBlobIndices.size;*/
-            
-            
-            // Find palm center
-            //  body = bodys[i];
-            //  bodys[i].palmCenter = findPalmCenter(body);
+            }
         }
     }
     
@@ -327,15 +212,6 @@ void DetectBody::drawProcess(int x, int y, int w, int h, int index)
 vector<Body> DetectBody::getbodys(){
     return bodys;
 }
-
-//vector<ofVec2f> DetectBody::getbodyPos(){
-//    vector <ofVec2f> bodyPositions;
-//    for(int i=0; i < bodys.size(); i++){
-//        ofVec2f point = bodys[i].palmCenter;
-//        bodyPositions.push_back(point);
-//    }
-//    return bodyPositions;
-//}
 
 vector<ofPolyline> DetectBody::getContours(){
     vector<ofPolyline> bodysPolys;
@@ -392,31 +268,31 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
         double curArea = contourArea(Mat(allContours[i]));
         
         allAreas.push_back(curArea);
-//        if(ofxCv::toOf(allContours[i]).getBoundingBox().width>ofxCv::toOf(allContours[i]).getBoundingBox().height){
-//            allIndices.push_back(i);
-//        }
-       // allAreas[i]=contourArea(Mat(allContours[i]));
+        //        if(ofxCv::toOf(allContours[i]).getBoundingBox().width>ofxCv::toOf(allContours[i]).getBoundingBox().height){
+        //            allIndices.push_back(i);
+        //        }
+        // allAreas[i]=contourArea(Mat(allContours[i]));
         if(curArea >= imgMinArea) {
             allIndices.push_back(i);
         }
         // }
     }
-   
+    
     // sort by size
     if (allIndices.size() > 1) {
         std::sort(allIndices.begin(), allIndices.end(), CompareContourArea(allAreas));
     }
     
     
-//    for(size_t i = 0; i < allIndices.size(); i++) {
-//        contoursLocal.push_back(allContours[allIndices[i]]);
-//        if( ofxCv::toOf(contoursLocal[i]).getBoundingBox().width>ofxCv::toOf(contoursLocal[i]).getBoundingBox().height){
-//            Body b = *new Body;
-//            b.boundaryPoly =ofxCv::toOf(contoursLocal[i]);
-//            bodys.push_back(b);
-//        }
-//    }
-//    
+    //    for(size_t i = 0; i < allIndices.size(); i++) {
+    //        contoursLocal.push_back(allContours[allIndices[i]]);
+    //        if( ofxCv::toOf(contoursLocal[i]).getBoundingBox().width>ofxCv::toOf(contoursLocal[i]).getBoundingBox().height){
+    //            Body b = *new Body;
+    //            b.boundaryPoly =ofxCv::toOf(contoursLocal[i]);
+    //            bodys.push_back(b);
+    //        }
+    //    }
+    //
     // generate polylines and bounding boxes from the contours
     contoursLocal.clear();
     bodys.clear();

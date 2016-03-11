@@ -98,24 +98,42 @@ public:
     
     void update(){
         
+        // bounce of body bounding box set in void detectPerson();
         // top:
         if(pos.x>rect->x && pos.x<rect->x+rect->width && pos.y> rect->y){
             pos.y = rect->y;
             vel*=friction;
-            
         }
         // side 1
         if(pos.y>rect->y && pos.y<rect->y+rect->height && pos.x> rect->x){
             pos.y = rect->y;
             vel*=friction;
-            
         }
         // side 2
         if(pos.y>rect->y && pos.y<rect->y+rect->height && pos.x < rect->x + rect->width){
             pos.y = rect->y;
             vel*=friction;
-            
         }
+        
+        //bounce of walls
+        if(pos.x>RES_WIDTH-size/2){
+            pos.x= RES_WIDTH-size/2;
+            vel*=friction;
+        }
+        if(pos.x<size/2){
+            pos.x= size/2;
+            vel*=friction;
+        }
+        if(pos.y>RES_HEIGHT-size/2){
+            pos.y= RES_HEIGHT-size/2;
+            vel*=-1; // no friction on ceiling
+        }
+        if(pos.y<size/2){
+            pos.y= size/2;
+            vel*=friction;
+        }
+        
+        // remove from top corners / avoid getting stuck
         if(pos.x > RES_WIDTH-size/2 && pos.y < size/2){
             vel.set(-1,1);
         }
@@ -123,37 +141,18 @@ public:
             vel.set(1,1);
         }
         
-        if(pos.x>RES_WIDTH-size/2){
-            pos.x= RES_WIDTH-size/2;
-            vel*=friction;
-
-        }
-        if(pos.x<size/2){
-            pos.x= size/2;
-            vel*=friction;
-
-
-        }
-        if(pos.y>RES_HEIGHT-size/2){
-            pos.y= RES_HEIGHT-size/2;
-            vel*=-1;
-
-
-        }
-        if(pos.y<size/2){
-            pos.y= size/2;
-            vel*=friction;
-
-        }
+        // min vel = 0.5
         if(vel.length() <0.5){
             vel *= 1.2;
         }
         
+        // add gravity (gravity = 0 atm)
         if(pos.y>RES_HEIGHT/2){
             vel.y += gravity;
         }
         pos+=vel;
         
+        // counter for alpha value- hasConnection controlled by dataPoints
         if(hasConnection && alpha < 230){
             alpha +=5;
         }else if(!hasConnection && alpha >0){
@@ -163,28 +162,19 @@ public:
         
     }
     void drawUC(){
-       
             float w = size;
             float h = size*(img2.getHeight()/img2.getWidth());
-            //int ratio = w/h;
             ofSetColor(255,alpha);
             img2.draw(pos.x-w/2,pos.y-h/2,w,h);
-            // ofSetColor(255);
-            // font->drawString(Name,pos.x-size/2,pos.y+size/2);
-        
     }
 
 
     void draw(){
-    
             float w = size;
             float h = size*(img.getHeight()/img.getWidth());
             //int ratio = w/h;
             ofSetColor(255,alpha);
             img.draw(pos.x-w/2,pos.y-h/2,w,h);
-            // ofSetColor(255);
-            // font->drawString(Name,pos.x-size/2,pos.y+size/2);
-        
     };
 };
 
@@ -203,12 +193,14 @@ public:
     float tl;
     float mover = 0;
     bool con = false;
-    ofVec2f att;
-    ofTrueTypeFont *font;
     bool addPower;
     int shooter;
     bool drawLines = true;
     bool fall = false;
+    bool alpha = false;
+    
+    ofVec2f att;
+    ofTrueTypeFont *font;
     
     
     void draw(){
@@ -222,7 +214,7 @@ public:
         shooter = shooter%100;
         
 
-        if(con && tl<0.95){
+        if(alpha && tl<0.95){
             tl+=0.01;
             addPower = true;
         }
@@ -259,13 +251,14 @@ public:
                 ofSetColor(20,255,20);
                 ofDrawEllipse(d.x,d.y,1,1);
                 // ofDrawEllipse(e.x,e.y,2,2);
+                if(con){
+                    connections[i]->hasConnection = true;
                 
-                connections[i]->hasConnection = true;
+                }
                 ofSetColor(255,tl*100);
                 ofSetLineWidth(0.5);
                 ofDrawLine(pos,c);
             }
-
             
         }
     };

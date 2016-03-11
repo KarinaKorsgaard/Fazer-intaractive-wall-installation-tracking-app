@@ -139,25 +139,19 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    
+    //does not work!!
     if(counter>30*5){
         kinect.close();
        
     }
     
     if(counter>30*10 && !kinect.isThreadRunning()){
-        kinect.open(); // GeForce on MacBookPro Retina
-        sleep(300);
+        //kinect.open(); // GeForce on MacBookPro Retina
+        //sleep(300);
       
     }
-    
-//    if (!kinect.isFrameNew()) {
-//       
-//        kinect.close();
-//        kinect.open(false, true, 0, 2); // GeForce on MacBookPro Retina
-//        kinect.start();
-//    }
-    
+    // --- ??
+
     pointCloud.tilt = tilt;
     pointCloud.translateX = translateX;
     pointCloud.translateY = translateY;
@@ -293,7 +287,7 @@ void ofApp::draw(){
     if(scanUp||freeze){
         for(int i = 0; i< numDatapoints;i++ ){
             if(datapoints[i]->isSet && datapoints[i]->pos.y > scanLine){
-                datapoints[i]->con = true;
+                datapoints[i]->alpha = true;
                 datapoints[i]->draw();
             }
         }
@@ -458,9 +452,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-    actors[setPoints]->pos = ofVec2f(x,y);
-    setPoints ++ ;
-    setPoints = setPoints%numActors;
+
 }
 
 //--------------------------------------------------------------
@@ -491,7 +483,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 //--------------------------------------------------------------
 void ofApp::positions(){
     
-    
+    //set datapoints positions when scanLine is down
     for(int i = 0; i<numDatapoints;i++){
         datapoints[i]->isSet = false;
     }
@@ -516,12 +508,10 @@ void ofApp::positions(){
         
         
         int h = contourPC.getBoundingBox().height/3;
-        int w = contourPC.getBoundingBox().width/5;
-       //int a = contourPC.getArea();
+        int w = contourPC.getBoundingBox().width/3;
         
         int stepX = 1;//sqrt((w*w) / numDatapoints);
         int stepY = 25;//sqrt((h*h) / numDatapoints);
-        //float scale = contourPoly[0].getArea()/100;
         
         int dp = ofRandom(1,numDatapoints-1);
         int stepXThis = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width/2;
@@ -529,15 +519,12 @@ void ofApp::positions(){
         vector<int>dpRandom;
         
         //int step =1;
-        //min step in y so they dont overlap
-        //if(stepY<30){stepY = 30;}
+        //if(stepY<25){stepY = 25;}
         
         for(int y = 0 ; y < RES_HEIGHT ; y+=stepY){
             
-            
-            
+            //int step = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width;
             //if(stepX<step){stepX = step;}
-            //stepX = step;
             for(int x = 0 ; x < RES_WIDTH ; x+= stepX + stepXThis){
                 
                 stepXThis = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width;
@@ -548,9 +535,7 @@ void ofApp::positions(){
                     datapoints[dp]->pos.x = x;
                     datapoints[dp]->pos.y = y;
                     datapoints[dp]->isSet = true;
-                    
-                    
-                    
+
                     dpRandom.push_back(dp);
                     
                     bool breakWhile = false;
@@ -568,7 +553,6 @@ void ofApp::positions(){
                             if(found ){
                                 breakWhile = true;
                             }
-                            
                         }
                     }
                     stepX = font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width;
@@ -623,10 +607,6 @@ void ofApp::detectPerson(){
 }
 //--------------------------------------------------------------
 void ofApp::timeLine(){
-    //beginning
-    if(!isPersonPresent){
-        isPPtimer=0;
-    }
     
     //if person is present for more than 100 frames -> start scanDown
     if(isPersonPresent && !active){
@@ -636,13 +616,13 @@ void ofApp::timeLine(){
             active = true;
         }
     }
+    //reset timer is person leaves
+    if(!isPersonPresent){
+        isPPtimer=0;
+    }
     
     // if scanline is down, scan go up.
     if(scanDown){
-
-        float x = abs (scanLine - RES_HEIGHT)/100;
-        //  scanLine = scanLine*scanLine  ;
-        // cout<< scanLine <<endl;
         scanLine +=15;
         if(scanLine > RES_HEIGHT){
             scanUp = true;
@@ -656,13 +636,16 @@ void ofApp::timeLine(){
         resetAll = true;
     }
     
-    
     // scan up- set datapoints positions, freese PC (updatePC) // when up, keep datapoints (freeze)
     if(scanUp){
         updatePC = false;
-        float x = abs (RES_HEIGHT - scanLine)/100;
         scanLine -=5;
         if(scanLine < 0){
+            
+            for(int i = 0; i<numDatapoints;i++){
+                datapoints[i]->con = true;
+            }
+            
             scanUp = false;
             freeze = true; // let dataPoints stay even if scanUp = false
             ending = true;
@@ -697,8 +680,7 @@ void ofApp::timeLine(){
         }
     }
     
-    
-    
+    //reset all timers, bools and datapoints
     if(resetAll ){
         lastTimer = 0; 
         endTimer = 0;
@@ -708,7 +690,6 @@ void ofApp::timeLine(){
         freeze = false;
         updatePC = true;
         setPositions = false;
-        //isPersonPresent = false;
         isPPtimer = 0;
         ending = false;
         endTimer = 0;
@@ -717,6 +698,7 @@ void ofApp::timeLine(){
         startFall = false;
         for(int i = 0; i< numDatapoints;i++){
             datapoints[i]->con = false;
+            datapoints[i]->alpha = false;
             datapoints[i]->tl = 0;
             datapoints[i]->fall = false;
         }
