@@ -40,6 +40,7 @@ public:
     void setPointSize(int _pointSize){ pointSize = _pointSize;}
     
     ofMesh mesh;
+
     //ofMesh frozenMesh;
     vector<ofVec3f>frozenVetices;
     
@@ -125,24 +126,6 @@ public:
         
         glDepthMask(GL_TRUE);
     }
-    
-//    ofFloatPixels backgroundPix;
-//    float getBackgroundAt(int x, int y) {
-//        if (!backgroundPix.isAllocated()) {
-//            return 0.0f;
-//        }
-//        return backgroundPix[x + y * backgroundPix.getWidth()] * 0.1; // mm to cm
-//    }
-//    
-//    void setBackgroundSubstract(ofxKinectV2 *kinect){
-//        backgroundPix = kinect->getDepthPixels();
-//        // to avoid noise, reduce depth for some cm.
-//        for(int i = 0; i<backgroundPix.size(); i++){
-//            if(backgroundPix[i]>100){
-//                backgroundPix[i]-=100;
-//            }
-//        }
-//    }
     
     void fall(){
         collapse += ofRandom(140);

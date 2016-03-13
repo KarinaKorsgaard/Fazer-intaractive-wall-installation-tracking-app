@@ -8,19 +8,23 @@ using namespace cv;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    resetAll = true;
-    
     ofSetVerticalSync(true);
     ofSetFrameRate(30);
+    ofEnableAntiAliasing();
     
+    // LOAD FONTS & IMAGES
     ofTrueTypeFont::setGlobalDpi(72);
     scanImage.load("scan.png");
     // font.load("Roboto.ttf", 12, true, true);
     font.load("Calibre/Calibre-Semibold.otf", 20, true, true);
+    
+    // INITIALISE FBO
     mainRender.allocate(800,1280);
     mainRender.begin();
     ofClear(0);
     mainRender.end();
+    
+    // LOAD THE DATA FROM THE CVS-FILE
     //csv----------------------------
     csv.loadFile(ofToDataPath("csv/csvALLCAPS.csv"));
     
@@ -44,8 +48,8 @@ void ofApp::setup(){
         }
         logo.load(str);
         actor.img2 = logo;
-
-
+        
+        
         actor.pos.x = ofRandom(RES_WIDTH);
         actor.pos.y = ofRandom(RES_HEIGHT);
         
@@ -124,6 +128,7 @@ void ofApp::setup(){
     
     syphon.setName("DAC Virtual Mirror");
     
+    resetAll = true; // fresh start
     
 }
 
@@ -139,6 +144,8 @@ void ofApp::update(){
     detectPerson();
     timeLine();
     
+    
+    // update the actors / big players
     for(int i = 0; i< actors.size();i++){
         actors[i].update();
         actors[i].rect = &thePerson;
@@ -147,9 +154,20 @@ void ofApp::update(){
         }
     }
     
+    int xPos[10] = {1, 1, 1, 1, 3, 6, 8, 8, 8, 8}; // 9 subdivisions
+    int yPos[10] = {12, 9, 6, 3, 1, 1, 3, 6, 9, 12}; // 18 Subdivisions
+    
+    if(actorsFixed){
+        for(int i = 0; i< actors.size();i++){
+            actors[i].pos = ofVec2f(800/9*xPos[i], 1280/18*yPos[i]);
+        }
+    }
+    
+    
     //update kinect
     counter ++;
     kinect.update();
+    
     if (kinect.isFrameNew()) {
         counter = 0;
         if(updatePC){
@@ -196,9 +214,7 @@ void ofApp::update(){
     ofBackground(0);
     ofSetColor(255);
     pointCloud.drawPSpline();
-    ofSetColor(255);
     renderPC.end();
-    
     
     
     //main render
@@ -218,7 +234,7 @@ void ofApp::update(){
     if(scanUp||freeze){
         for(int i = 0; i< datapoints.size();i++ ){
             if(datapoints[i].isSet && datapoints[i].pos.y > scanLine){
-                datapoints[i].alpha = true;
+                if(scanLine>0)datapoints[i].bAlpha = true; // needed to make them disapear in fall
                 datapoints[i].draw();
             }
         }
@@ -275,7 +291,7 @@ void ofApp::draw(){
         ofSetColor(255, 0, 255);
         ofDrawRectangle(bPosX-thresW/2, bPosY-thresH/2, thresW, thresH);
         if(detectBody.getBodies().size()>0){
-            ofSetColor(255, 0, 0);
+            if(isPersonPresent)ofSetColor(255, 0, 0);
             ofDrawEllipse(detectBody.getBodies()[0].centroid.x, detectBody.getBodies()[0].centroid.y,20,20);
         }
         ofPopMatrix();
@@ -367,6 +383,9 @@ void ofApp::keyPressed(int key){
     if(key == 's'){
         circleLogo = !circleLogo;
     }
+    if(key == 'a'){
+        actorsFixed = !actorsFixed;
+    }
     
     if(key == '1') {
         imgIndx = 1;
@@ -404,73 +423,44 @@ void ofApp::positions(){
     //get a polyline
     contourPC = getBodyPoly();
     
-    //not used atm
-    //int h = contourPC.getBoundingBox().height/3;
-    //int w = contourPC.getBoundingBox().width/3;
+    ofRectangle cBndBox = contourPC.getBoundingBox();
     
-    int stepXThis=1;
-    int stepX = 1;//sqrt((w*w) / datapoints.size());
-    int stepY = 25;//sqrt((h*h) / datapoints.size());
+    int stepY = cBndBox.getHeight()/23;
     
-    //make data appear in random order
-    int dp = ofRandom(1,datapoints.size()-1);
-    
-    //vector to store values that has been set
-    vector<int>dpRandom;
-    
-    //int step =1;
-    //if(stepY<25){stepY = 25;}
-    
-    for(int y = 0 ; y < RES_HEIGHT ; y+=stepY){
-        for(int x = 0 ; x < RES_WIDTH ; x+= stepX + stepXThis){
-            //set step to 2
-            stepXThis = 2;//font.getStringBoundingBox(datapoints[dp]->Name, 0, 0).width;
-            stepX = 2;
-            ofPoint p = ofPoint(x,y);
+    vector<ofPoint> unifDistPoints;
+    int d = 0;
+    for (int iY=0; iY < cBndBox.getHeight(); iY+=stepY ){
+        d++;
+        int stepX = cBndBox.getWidth()/3;
+        if(d%2 == 1)stepX = cBndBox.getWidth()/4;
+        
+        for(int iX=0; iX< cBndBox.getWidth(); iX+=stepX ){
+            ofPoint p;
+            p.x = iX+cBndBox.x;
+            p.y = iY+cBndBox.y;
             if(contourPC.inside(p)){
-                //if point is inside, set stepX
-                stepXThis = font.getStringBoundingBox(datapoints[dp].Name, 0, 0).width;
-                
-                datapoints[dp].pos.x = x;
-                datapoints[dp].pos.y = y;
-                datapoints[dp].isSet = true;
-                
-                //find new number that has not been set already
-                dpRandom.push_back(dp);
-                bool breakWhile = false;
-                
-                if(dpRandom.size() < datapoints.size()){
-                    while(!breakWhile){
-                        dp = ofRandom(datapoints.size());
-                        bool found = true;
-                        for(int i = 0; i < dpRandom.size();i++){
-                            if(dp == dpRandom[i]){
-                                found = false;
-                            }
-                        }
-                        if(found ){
-                            breakWhile = true;
-                        }
-                    }
-                }
-                
-                //not sure why, but I need to move the point both the prev and current to make sure they dont overlap.
-                stepX = font.getStringBoundingBox(datapoints[dp].Name, 0, 0).width;
-                
+                unifDistPoints.push_back(p);
             }
         }
+    }
+    
+    random_shuffle(unifDistPoints.begin(), unifDistPoints.end()); // shuffle the points
+    
+    for( int i = 0; i < unifDistPoints.size() && i < datapoints.size(); i++){
+        datapoints[i].pos = unifDistPoints[i];
+        datapoints[i].isSet = true;
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::detectPerson(){
-    
     if(detectBody.getBodies().size()>0){
-        ofPolyline p = detectBody.getBodies()[0].boundaryPoly;
-        //bounding box and center does not equal getBodyPoly - not translated
+        isPersonPresent = false;
         
-        //analysing largest blob boundaryPoly
+        ofPolyline p = detectBody.getBodies()[0].boundaryPoly;
+        // check if the detected blob is taler than wide
         if(p.getBoundingBox().width > p.getBoundingBox().height){
+            // check ig the center of the blob is in the cone we are capturing
             if(detectBody.getBodies()[0].centroid.x > bPosX-thresW/2 &&
                detectBody.getBodies()[0].centroid.x < bPosX+thresW/2 &&
                detectBody.getBodies()[0].centroid.y > bPosY-thresH/2 &&
@@ -478,20 +468,17 @@ void ofApp::detectPerson(){
                ){
                 isPersonPresent = true;
                 contourPC = getBodyPoly();
+                
                 //make rect of boundingbox to pass to actors
                 thePerson = ofRectangle(contourPC.getBoundingBox().x,contourPC.getBoundingBox().y, contourPC.getBoundingBox().width, contourPC.getBoundingBox().height);
             }
-        }
-        
-        else{
-            isPersonPresent = false;
+        } else{
             thePerson  = ofRectangle(0,0,0,0);
         }
     }
 }
 //--------------------------------------------------------------
 void ofApp::timeLine(){
-    
     //if person is present for more than 100 frames -> start scanDown
     if(isPersonPresent && !active){
         isPPtimer++;
@@ -527,7 +514,7 @@ void ofApp::timeLine(){
         if(scanLine < 0){
             for(int i = 0; i<datapoints.size();i++){
                 // length ->start length counter.
-                datapoints[i].length = true;
+                datapoints[i].bLength = true;
             }
             scanUp = false;
             freeze = true; // let dataPoints stay even if scanUp = false
@@ -562,8 +549,12 @@ void ofApp::timeLine(){
         }
     }
     
+    
+    
+    
     //reset all timers, bools and datapoints
     if(resetAll ){
+        
         lastTimer = 0;
         endTimer = 0;
         scanLine = 0;
@@ -579,14 +570,13 @@ void ofApp::timeLine(){
         resetAll = false;
         startFall = false;
         for(int i = 0; i< datapoints.size();i++){
-            datapoints[i].length = false;
-            datapoints[i].alpha = false;
+            datapoints[i].bLength = false;
+            datapoints[i].bAlpha = false;
             datapoints[i].tlAlpha = 0;
             datapoints[i].tlLength = 0;
             datapoints[i].fall = false;
         }
         active = false;
-        
     }
 }
 
@@ -596,31 +586,28 @@ ofPolyline ofApp::getBodyPoly(){
     ofPolyline p;
     
     if(detectBody.getBodies().size()>0){
-        ofPolyline pDB = detectBody.getBodies()[0].boundaryPoly;
-        if(pDB.getBoundingBox().width > pDB.getBoundingBox().height){
-            cv::Mat contourPCMat;
-            contourPCMat = cv::Mat::zeros( cvSize(RES_WIDTH,RES_HEIGHT), CV_8U );
-            ofPixels imagePC;
-            renderPC.readToPixels(imagePC);
-            ofxCv::toCv(imagePC).convertTo(contourPCMat, CV_8UC1);
+        cv::Mat contourPCMat;
+        contourPCMat = cv::Mat::zeros( cvSize(RES_WIDTH,RES_HEIGHT), CV_8U );
+        ofPixels imagePC;
+        renderPC.readToPixels(imagePC);
+        ofxCv::toCv(imagePC).convertTo(contourPCMat, CV_8UC1);
+        
+        int closingNum = 10;
+        bitwise_not(contourPCMat, contourPCMat);
+        erode(contourPCMat, contourPCMat, cv::Mat(), cv::Point(-1,-1), closingNum);
+        bitwise_not(contourPCMat, contourPCMat);
+        ofxCv::ContourFinder contourFindPC;
+        contourFindPC.setSortBySize(true);
+        contourFindPC.findContours(contourPCMat);
+        
+        if(bDebug){
+            ofxCv::toOf(contourPCMat, contourDetectImg);
+            contourDetectImg.update();
+        }
+        
+        if(contourFindPC.getPolylines().size()>0){
             
-            int closingNum = 10;
-            bitwise_not(contourPCMat, contourPCMat);
-            erode(contourPCMat, contourPCMat, cv::Mat(), cv::Point(-1,-1), closingNum);
-            bitwise_not(contourPCMat, contourPCMat);
-            ofxCv::ContourFinder contourFindPC;
-            contourFindPC.setSortBySize(true);
-            contourFindPC.findContours(contourPCMat);
-            
-            if(bDebug){
-                ofxCv::toOf(contourPCMat, contourDetectImg);
-                contourDetectImg.update();
-            }
-            
-            if(contourFindPC.getPolylines().size()>0){
-                
-                p = contourFindPC.getPolyline(0);
-            }
+            p = contourFindPC.getPolyline(0);
         }
     }
     return p;

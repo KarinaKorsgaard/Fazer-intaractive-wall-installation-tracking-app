@@ -165,7 +165,7 @@ public:
     void drawUC(){
             float w = size;
             float h = size*(img2.getHeight()/img2.getWidth());
-            ofSetColor(255,255);
+            ofSetColor(255, alpha);
             img2.draw(pos.x-w/2,pos.y-h/2,w,h);
     }
 
@@ -174,7 +174,7 @@ public:
             float w = size;
             float h = size*(img.getHeight()/img.getWidth());
             //int ratio = w/h;
-            ofSetColor(255, 255);
+            ofSetColor(255, alpha);
             img.draw(pos.x-w/2,pos.y-h/2,w,h);
     };
 };
@@ -197,8 +197,8 @@ public:
     bool drawLines = true;
     bool fall = false;
     
-    bool alpha = false;
-    bool length = false;
+    bool bAlpha = false;
+    bool bLength = false;
     float tlAlpha;
     float tlLength;
     
@@ -207,45 +207,36 @@ public:
     
     void draw(){
         
-        shooter++;
+        if(tlLength>0.95)shooter++;
         shooter = shooter%100;
         
         //alpha counter
-        if(alpha && tlAlpha<0.95){
+        if(bAlpha && tlAlpha<1){
             tlAlpha+=0.01;
+        } else if (!bAlpha && tlAlpha > 0){
+            tlAlpha -= 0.01;
         }
+        //cout << "alpha: "<< alpha << " tlAlpha: " << tlAlpha << endl;
         
         //start line length counter
-        if(length && tlLength<0.95){
+        if(bLength && tlLength<1.){
             tlLength+=0.01;
+        } else if (!bLength && tlLength > 0){
+            tlLength-=0.01;
         }
         
-        if(tlAlpha>=0){
-            // draw dataPoints_
-            ofFill();
-            ofSetColor(0,tlAlpha*200);
-            ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
-            ofRectangle myRect;
-            myRect.x = pos.x-6-rect.width+40;
-            myRect.y = pos.y-6-rect.height;
-            myRect.width = rect.width+12;
-            myRect.height = rect.height+12;
-            ofDrawRectRounded(myRect, 5);
-            ofSetColor(255,tlAlpha*255);
-            font->drawString(Name,pos.x-rect.width+40,pos.y);
-            // draw dataPoints_end
-            
+        if(tlAlpha>0){
             // draw lines if con. con = true if scanLine is all up.
-            if(length){
+            if(bLength){
                 for(int i = 0; i<connectToActorID.size();i++){
                     // start drawing the connection to the actors
-                    ofVec2f a = ofVec2f(pos.x-(rect.width+40)/2, pos.y);
-                    ofVec2f b = actors->at(connectToActorID[i]).pos;
-                    ofVec2f c = (b - a)*tlLength+a;
-                    ofVec2f d = (b - a)*shooter/100+a;
-
-                    ofSetColor(20,255,20);
-                    ofDrawEllipse(d.x,d.y,1,1);
+                    ofVec2f posAct = actors->at(connectToActorID[i]).pos;
+                    actors->at(connectToActorID[i]).hasConnection = true;
+                    ofVec2f c = pos.getInterpolated(posAct, tlLength);
+                    ofVec2f d = pos.getInterpolated(posAct, (float)shooter/100);
+                    
+                    ofSetColor(255);
+                    if(tlLength >= 1) ofDrawEllipse(d.x,d.y,2,2);
                     // ofDrawEllipse(e.x,e.y,2,2);
                     
                     ofSetColor(255,tlAlpha*100);
@@ -253,16 +244,41 @@ public:
                     ofDrawLine(pos,c);
                 }
             }
+
+            
+            // draw dataPoints_
+            ofFill();
+            ofSetColor(0,tlAlpha*200);
+            ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
+            ofRectangle myRect;
+            int frame = 6;
+            myRect.x = pos.x-frame-rect.width/2;
+            myRect.y = pos.y-frame-rect.height/2;
+            myRect.width = rect.width+frame*2;
+            myRect.height = rect.height+frame*2;
+            ofDrawRectRounded(myRect, 5);
+            ofSetColor(255,tlAlpha*255);
+            font->drawString(Name,pos.x-rect.width/2,pos.y+frame);
+            // draw dataPoints_end
+            
             
             if(fall){
-                //length
-                tlLength-=0.01;
-                tlAlpha-=0.01;
-                length = false;
-                alpha = false;
+                bLength = false;
+                bAlpha = false;
+                
+                if(tlLength > 0){
+                    for(int i = 0; i<connectToActorID.size();i++){
+                        // start drawing the connection to the actors
+                        ofVec2f posAct = actors->at(connectToActorID[i]).pos;
+                        ofVec2f c = posAct.getInterpolated(pos, tlLength);
+                        
+                        
+                        ofSetColor(255,tlAlpha*100);
+                        ofSetLineWidth(0.5);
+                        ofDrawLine(posAct,c);
+                    }
+                }
             }
-            
-            
         }
     };
     

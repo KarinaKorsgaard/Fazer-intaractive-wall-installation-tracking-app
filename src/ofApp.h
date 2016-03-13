@@ -76,10 +76,11 @@ class ofApp : public ofBaseApp{
     int lastTimer = 0;
     int lastTimerThres = 200;
     int scanLineHeight = 100;
-    
+        
     bool bDebug = true;
     
     bool circleLogo = false;
+    bool actorsFixed = true;
     
     //close/open kinect counter. Does not work
     int counter = 0;
