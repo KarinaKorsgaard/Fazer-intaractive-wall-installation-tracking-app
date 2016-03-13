@@ -71,6 +71,7 @@ public:
     float friction = -0.98;
     float gravity = 0;//-0.02;
     float spring = 0.03;
+    
   
     void checkCollision(Actor *ofActor){
         float x = pos.x;

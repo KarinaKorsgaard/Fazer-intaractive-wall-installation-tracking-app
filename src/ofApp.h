@@ -61,7 +61,7 @@ class ofApp : public ofBaseApp{
     float falling;
     int top = 0;
     int bot = ofGetWidth();
-    int imgIndx = 0;
+    int imgIndx = 7;
     
 
    // ofPixels colorPix;
@@ -120,10 +120,10 @@ class ofApp : public ofBaseApp{
     ofParameter<float>botDepth;
     ofParameter<float>edgeDepth;
     
-    ofParameter<int>   bPosXlow;
-    ofParameter<int>   thresX;
-    ofParameter<int>   bPosYlow;
-    ofParameter<int>   thresY;
+    ofParameter<int>   bPosX;
+    ofParameter<int>   thresW;
+    ofParameter<int>   bPosY;
+    ofParameter<int>   thresH;
     ofParameter<int>   floor;
     
     ofRectangle thePerson;

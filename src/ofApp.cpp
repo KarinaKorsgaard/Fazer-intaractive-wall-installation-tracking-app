@@ -111,16 +111,17 @@ void ofApp::setup(){
     pointCloudSetup.add(translateX.set("translateX", -512, -1000, 1000));
     pointCloudSetup.add(translateY.set("translateY", -512, -3000, 1000));
     pointCloudSetup.add(translateZ.set("translateZ", -2000, -2000, 2000));
+    pointCloudSetup.add(floor.set("floor", 0, -8000, 8000));
+
     
     testParams.setName("testParams");
     
-    testParams.add(bPosXlow.set("bPosXlow", 0, 0, RES_WIDTH));
-    testParams.add(thresX.set("thresX", 0, 0, RES_WIDTH));
+    testParams.add(bPosX.set("bPosX", 0, 0, 424));
+    testParams.add(thresW.set("thresW", 0, 0, 424));
     
-    testParams.add(bPosYlow.set("bPosYlow", 0, 0, RES_HEIGHT));
-    testParams.add(thresY.set("thresY", 0, 0, RES_HEIGHT));
+    testParams.add(bPosY.set("bPosY", 0, 0, 512));
+    testParams.add(thresH.set("thresH", 0, 0, 512));
     
-    testParams.add(floor.set("floor", 0, -8000, 8000));
     
     
     paramters.add(testParams);
@@ -272,18 +273,33 @@ void ofApp::draw(){
     
     if(bDebug){
         
+        int xPrev = 250;
+        int yPrev = 10;
+        float scale = 0.75;
+        ofPushMatrix();
+        ofTranslate(xPrev+424*scale, yPrev);
+        ofScale(scale,scale,scale);
+        ofRotateZ(90);
+        
         ofNoFill();
-       
-        
-        ofDrawRectangle(bPosXlow+gui.getWidth(), bPosYlow,thresX, thresY);
-        if(detectBody.getbodys().size()>0){
-        ofDrawEllipse(detectBody.getbodys()[0].centroid.x + +gui.getWidth(), detectBody.getbodys()[0].centroid.y,20,20);
-        }
-        
-        detectBody.drawProcess(10, 300, 512/2, 424/2, imgIndx);
-        detectBody.drawOverlay(10, 300, 512/2, 424/2);
+        // draw PreviewWindow;
+        detectBody.drawProcess(0, 0, 512, 424, imgIndx);
+        detectBody.drawOverlay(0, 0, 512, 424);
         ofSetColor(0,255,0);
-        ofDrawLine(10+edge/2, 300, 10+edge/2, 300+424/2);
+        ofDrawLine(edge, 0, edge, 424); // edge line
+        ofSetColor(255);
+        ofDrawRectangle(0, 0, 512, 424); // frame
+        
+        // draw detect Space
+        ofSetColor(255, 0, 255);
+        ofDrawRectangle(bPosY-thresH/2, bPosX-thresW/2, thresH, thresW);
+        if(detectBody.getbodys().size()>0){
+            ofSetColor(255, 0, 0);
+            ofDrawEllipse(detectBody.getbodys()[0].centroid.x, detectBody.getbodys()[0].centroid.y,20,20);
+        }
+        ofPopMatrix();
+        
+        
         ofSetColor(255);
         
         ofDrawBitmapString(ofToString(detectBody.getbodys().size()), 500,10);
@@ -515,10 +531,10 @@ void ofApp::detectPerson(){
         
         //analysing largest blob boundaryPoly
         if(p.getBoundingBox().width > p.getBoundingBox().height){
-            if(detectBody.getbodys()[0].centroid.x >bPosXlow &&
-               detectBody.getbodys()[0].centroid.x <bPosXlow+thresX &&
-               detectBody.getbodys()[0].centroid.y >bPosYlow &&
-               detectBody.getbodys()[0].centroid.y <bPosYlow+thresY
+            if(detectBody.getbodys()[0].centroid.x > bPosX-thresW/2 &&
+               detectBody.getbodys()[0].centroid.x <bPosX+thresW/2 &&
+               detectBody.getbodys()[0].centroid.y >bPosY-thresH/2 &&
+               detectBody.getbodys()[0].centroid.y <bPosY+thresH/2
                ){
                 isPersonPresent = true;
                 contourPC = getBodyPoly();
