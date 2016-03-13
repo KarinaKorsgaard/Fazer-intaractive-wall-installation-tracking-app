@@ -28,16 +28,16 @@
 	<thresX>277</thresX>
 		<thresY>254</thresY>
 	<floor>2530</floor>
-	<bPosX>207</bPosX>
-		<thresW>201</thresW>
-		<bPosY>201</bPosY>
-		<thresH>300</thresH>
+	<bPosX>227</bPosX>
+		<thresW>235</thresW>
+		<bPosY>198</bPosY>
+		<thresH>211</thresH>
 	</testParams>
 	<pointCloudSetup>
 		<tilt>-3.57143</tilt>
 		<translateX>306</translateX>
 		<translateY>-857</translateY>
 		<translateZ>-1020</translateZ>
-	<floor>0</floor>
+	<floor>2204</floor>
 	</pointCloudSetup>
 </group>

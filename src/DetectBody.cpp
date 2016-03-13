@@ -147,8 +147,8 @@ void DetectBody::update(cv::Mat image)
     //    erode(activeAreaMask, dilatedTableEdges, cv::Mat(), cv::Point(-1,-1), 5); // last 2 closing num, may change
     //
     
-    if(bodys.size()>0){
-        for(vector<Body>::iterator b=bodys.begin(); b!=bodys.end(); b++)
+    if(bodies.size()>0){
+        for(vector<Body>::iterator b=bodies.begin(); b!=bodies.end(); b++)
         {
             
             b->indices.clear();
@@ -177,9 +177,9 @@ void DetectBody::update(cv::Mat image)
 void DetectBody::drawOverlay(int x, int y, int w, int h)
 {
     outputImage.begin();
-    for (int i = 0; i < bodys.size(); i++)
+    for (int i = 0; i < bodies.size(); i++)
     {
-        bodys[i].draw();
+        bodies[i].draw();
     }
     outputImage.end();
     
@@ -209,16 +209,16 @@ void DetectBody::drawProcess(int x, int y, int w, int h, int index)
 
 // GET DATA
 
-vector<Body> DetectBody::getbodys(){
-    return bodys;
+vector<Body> DetectBody::getBodies(){
+    return bodies;
 }
 
 vector<ofPolyline> DetectBody::getContours(){
-    vector<ofPolyline> bodysPolys;
-    for(int i = 0; i<bodys.size();i++){
-        bodysPolys.push_back(bodys[i].boundaryPoly);
+    vector<ofPolyline> bodiesPolys;
+    for(int i = 0; i<bodies.size();i++){
+        bodiesPolys.push_back(bodies[i].boundaryPoly);
     }
-    return bodysPolys;
+    return bodiesPolys;
 }
 
 
@@ -289,25 +289,25 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
     //        if( ofxCv::toOf(contoursLocal[i]).getBoundingBox().width>ofxCv::toOf(contoursLocal[i]).getBoundingBox().height){
     //            Body b = *new Body;
     //            b.boundaryPoly =ofxCv::toOf(contoursLocal[i]);
-    //            bodys.push_back(b);
+    //            bodies.push_back(b);
     //        }
     //    }
     //
     // generate polylines and bounding boxes from the contours
     contoursLocal.clear();
-    bodys.clear();
-    bodys.resize(allIndices.size());
+    bodies.clear();
+    bodies.resize(allIndices.size());
     // boundingRects.clear();
     for(size_t i = 0; i < allIndices.size(); i++) {
         contoursLocal.push_back(allContours[allIndices[i]]);
-        bodys[i].boundaryPoly = ofxCv::toOf(contoursLocal[i]);
+        bodies[i].boundaryPoly = ofxCv::toOf(contoursLocal[i]);
         
         
         //  boundingRects.push_back(boundingRect(contours[i]));
         
         vector<cv::Point> tmp;
         for(size_t i2 = 0; i2 < contoursLocal[i].size(); i2++) {
-            bodys[i].boundary.push_back(ofxCv::toOf(contoursLocal[i][i2]));
+            bodies[i].boundary.push_back(ofxCv::toOf(contoursLocal[i][i2]));
             tmp.push_back(contoursLocal[i][i2]);
         }
         
@@ -318,7 +318,7 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
         cv::drawContours(drawedContour,contourVec,0,Scalar(255,255,255),CV_FILLED, 0);
         
         
-        bodys[i].bodyBlob = drawedContour;
+        bodies[i].bodyBlob = drawedContour;
         
         
         
@@ -326,7 +326,7 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
         ofVec2f center;
         cv::Moments m = moments(contoursLocal[i]);
         center = ofxCv::toOf(cv::Point2f(m.m10 / m.m00, m.m01 / m.m00));
-        bodys[i].centroid = center;
+        bodies[i].centroid = center;
     }
     
     
@@ -378,17 +378,17 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
      }
      
      
-     // Clear all previous bodys
-     bodys.clear();
+     // Clear all previous bodies
+     bodies.clear();
      
      
      // Get the body boundaries (take as many as we are allowed)
-     bodys.resize(contours.size());
-     for(int i=0; i<bodys.size(); i++)
+     bodies.resize(contours.size());
+     for(int i=0; i<bodies.size(); i++)
      {
      CvSeq& contour = *contours[i];
-     bodys[i].boundrySeq = &contour;
-     //  ((bodyPimpl*)bodys[i].bodyPimpl)->SetBoundary(contour);
+     bodies[i].boundrySeq = &contour;
+     //  ((bodyPimpl*)bodies[i].bodyPimpl)->SetBoundary(contour);
      
      CvSeqReader reader;
      cvStartReadSeq(&contour, &reader, 0);
@@ -398,7 +398,7 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
      CvPoint point;
      memcpy(&point, reader.ptr, contour.elem_size);
      
-     bodys[i].boundary.push_back(ofVec2f(point.x, point.y));
+     bodies[i].boundary.push_back(ofVec2f(point.x, point.y));
      
      CV_NEXT_SEQ_ELEM(contour.elem_size, reader);
      }
@@ -407,12 +407,12 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
      
      //   cvDrawContours(&blobImage, const_cast<CvSeq*>(((bodyPimpl*)bodyPimpl)->GetBoundary()), color, color, 0, thickness);
      
-     IplImage armBlobImage = bodys[i].armBlob;
+     IplImage armBlobImage = bodies[i].armBlob;
      
      cvDrawContours( &armBlobImage, &contour, CV_RGB(255, 255, 255), CV_RGB(255, 255, 255), 0, -1);
-     //bodys[i].armBlob = Mat(armBlobImage, true);
+     //bodies[i].armBlob = Mat(armBlobImage, true);
      
-     //   cv::drawContours(bodys[i].armBlob, contours, i, CV_RGB(255, 255, 255));
+     //   cv::drawContours(bodies[i].armBlob, contours, i, CV_RGB(255, 255, 255));
      
      
      }

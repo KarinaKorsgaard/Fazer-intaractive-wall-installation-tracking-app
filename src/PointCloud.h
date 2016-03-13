@@ -47,23 +47,13 @@ public:
         
         
         texSpline.allocate(128,128, GL_RGBA);
-        
-//        renderer.allocate(RES_WIDTH, RES_HEIGHT, GL_RGBA);//A32F_ARB);
-//        renderer.begin();
-//        ofClear(255,255,255, 0);
-//        // load the texure
-//        ofEnableSmoothing();
-//        renderer.end();
-        
-        //ofDisableArbTex();
+
         ofDisableArbTex();
         ofLoadImage(texSpline, "dot.png");
         ofEnableArbTex();
         
         vector<ofVec3f> vel;
-        // load the shader
-        // shaderSplineReplace.setupShaderFromSource(GL_VERTEX_SHADER, splineReplaceShader);
-        // shaderSplineReplace.linkProgram();
+
         shaderSplineReplace.load("shaders/shader");
         shaderSplineReplace.setUniform2f("screenSize", (float)RES_WIDTH, (float)RES_HEIGHT);
     }
@@ -78,8 +68,6 @@ public:
                 indx++;
                 
                 if(indx%2 == 0){
-                    
-                    //float dist = kinect->getDistanceAt(ind->x, ind->y);
                     
                     ofVec3f pt = kinect->getWorldCoordinateAt(ind->x,ind->y);
                     
@@ -99,18 +87,6 @@ public:
                     
                     pt.x = RES_WIDTH-pt.x;
                     pt.y = RES_HEIGHT-pt.y;
-                    
-                    
-                    // pt.set(x,y,dist);
-                    
-                    // ofColor c;
-                    // float h = ofMap(dist, 0, 8000, 255, 100, true);
-                    // c.setHsb(255, h ,255);
-                    
-                    
-                    // c = ofFloatColor(ofNoise((dist+ofGetFrameNum()/10)*0.001, (dist+ofGetFrameNum())*0.001));
-                    
-                    // mesh.addColor(c);
                     
                     mesh.addVertex(pt);
                 }
@@ -150,23 +126,23 @@ public:
         glDepthMask(GL_TRUE);
     }
     
-    ofFloatPixels backgroundPix;
-    float getBackgroundAt(int x, int y) {
-        if (!backgroundPix.isAllocated()) {
-            return 0.0f;
-        }
-        return backgroundPix[x + y * backgroundPix.getWidth()] * 0.1; // mm to cm
-    }
-    
-    void setBackgroundSubstract(ofxKinectV2 *kinect){
-        backgroundPix = kinect->getDepthPixels();
-        // to avoid noise, reduce depth for some cm.
-        for(int i = 0; i<backgroundPix.size(); i++){
-            if(backgroundPix[i]>100){
-                backgroundPix[i]-=100;
-            }
-        }
-    }
+//    ofFloatPixels backgroundPix;
+//    float getBackgroundAt(int x, int y) {
+//        if (!backgroundPix.isAllocated()) {
+//            return 0.0f;
+//        }
+//        return backgroundPix[x + y * backgroundPix.getWidth()] * 0.1; // mm to cm
+//    }
+//    
+//    void setBackgroundSubstract(ofxKinectV2 *kinect){
+//        backgroundPix = kinect->getDepthPixels();
+//        // to avoid noise, reduce depth for some cm.
+//        for(int i = 0; i<backgroundPix.size(); i++){
+//            if(backgroundPix[i]>100){
+//                backgroundPix[i]-=100;
+//            }
+//        }
+//    }
     
     void fall(){
         collapse += ofRandom(140);

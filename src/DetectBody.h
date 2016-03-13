@@ -35,8 +35,8 @@ public:
     void createGenericMask();
 
     // GET DATA
-    vector<Body> getbodys();
-    vector<ofVec2f> getbodyPos();
+    vector<Body> getBodies();
+    vector<ofVec2f> getBodyPos();
     vector<ofPolyline> getContours();
     
     void setTresholds(float near, float far, float t){
@@ -44,8 +44,6 @@ public:
         farThreshold = far;
         tilt = t;
     }
-    float test1 = 1;
-    float test2 = 1;
     
     cv::Mat gradient;
 private:
@@ -74,7 +72,7 @@ private:
     cv::Mat activeAreaMask;
 
     ofVec2f bodyPosition;
-    vector<Body> bodys;
+    vector<Body> bodies;
 
     
     int width, height;

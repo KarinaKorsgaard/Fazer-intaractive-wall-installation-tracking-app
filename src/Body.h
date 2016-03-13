@@ -65,7 +65,7 @@ public:
     int counter = 0;
     bool hasConnection = false;
     
-    int alpha =0;
+    int alpha = 0;
     ofRectangle *rect = new ofRectangle;
     
     float friction = -0.98;
@@ -165,7 +165,7 @@ public:
     void drawUC(){
             float w = size;
             float h = size*(img2.getHeight()/img2.getWidth());
-            ofSetColor(255,alpha);
+            ofSetColor(255,255);
             img2.draw(pos.x-w/2,pos.y-h/2,w,h);
     }
 
@@ -174,7 +174,7 @@ public:
             float w = size;
             float h = size*(img.getHeight()/img.getWidth());
             //int ratio = w/h;
-            ofSetColor(255,alpha);
+            ofSetColor(255, 255);
             img.draw(pos.x-w/2,pos.y-h/2,w,h);
     };
 };
@@ -188,8 +188,8 @@ public:
     string Name;
     ofVec2f pos;
     
-    // float posX,posY,posZ;
-    vector<Actor*>connections;
+    vector<Actor> *actors;
+    vector<int>connectToActorID;
     bool isSet;
     float mover = 0;
     
@@ -205,7 +205,6 @@ public:
     ofVec2f att;
     ofTrueTypeFont *font;
     
-    
     void draw(){
         
         shooter++;
@@ -220,7 +219,7 @@ public:
         if(length && tlLength<0.95){
             tlLength+=0.01;
         }
-
+        
         if(tlAlpha>=0){
             // draw dataPoints_
             ofFill();
@@ -238,12 +237,10 @@ public:
             
             // draw lines if con. con = true if scanLine is all up.
             if(length){
-                for(int i = 0; i<connections.size();i++){
-                    // start drawing the actors
-                    connections[i]->hasConnection = true;
-                    
-                    ofVec2f a; a.set(pos.x-(rect.width+40)/2, pos.y);
-                    ofVec2f b = connections[i]->pos;
+                for(int i = 0; i<connectToActorID.size();i++){
+                    // start drawing the connection to the actors
+                    ofVec2f a = ofVec2f(pos.x-(rect.width+40)/2, pos.y);
+                    ofVec2f b = actors->at(connectToActorID[i]).pos;
                     ofVec2f c = (b - a)*tlLength+a;
                     ofVec2f d = (b - a)*shooter/100+a;
 

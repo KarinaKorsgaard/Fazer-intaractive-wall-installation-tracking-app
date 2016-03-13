@@ -21,16 +21,6 @@ class ofApp : public ofBaseApp{
 		void draw();
 
 		void keyPressed(int key);
-		void keyReleased(int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void mouseEntered(int x, int y);
-		void mouseExited(int x, int y);
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
     
     float getAvgDepth(ofRectangle space, ofxKinectV2 *kinect);
     void positions();
@@ -38,6 +28,8 @@ class ofApp : public ofBaseApp{
     void timeLine();
     
     ofPolyline contourPC;
+    ofImage contourDetectImg;
+
     ofTrueTypeFont font;
     ofxKinectV2 kinect;
     PointCloud pointCloud;
@@ -52,19 +44,16 @@ class ofApp : public ofBaseApp{
     
     ofFbo scanRender;
     ofFbo renderPC;
-    DataPoint** datapoints;
-    Actor** actors;
+    vector<DataPoint> datapoints;
+    vector<Actor> actors;
     wng::ofxCsv csv;
     
     ofxSyphonServer syphon;
-    int numDatapoints, numActors;
+
     float falling;
     int top = 0;
     int bot = ofGetWidth();
     int imgIndx = 7;
-    
-
-   // ofPixels colorPix;
     
     
     float scanLine;
@@ -76,7 +65,7 @@ class ofApp : public ofBaseApp{
     bool setPositions;
     bool isPersonPresent = false;
     int isPPtimer = 0;
-    int isPPthres = 100;
+    int isPPthres = 90; // number of frames befor scanline -> 90 = 3sec
     bool ending = false;
     int endTimer = 0;
     int endTimerThres = 600;
@@ -103,8 +92,6 @@ class ofApp : public ofBaseApp{
     ofParameterGroup pointCloudSetup;
     ofParameterGroup testParams;
     ofParameterGroup paramters;
-    ofParameter<float>   test1; // idle GUI params for testing stuff
-    ofParameter<float>   test2;
     ofParameter<float>   nearThreshold;
     ofParameter<float>   farThreshold;
     ofParameter<float>   tilt;
