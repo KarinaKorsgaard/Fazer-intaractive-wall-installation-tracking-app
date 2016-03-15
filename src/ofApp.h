@@ -9,9 +9,12 @@
 #include "ofxCv.h"
 #include "ofxGui.h"
 #include "ofxCsv.h"
+#include "ofxOsc.h"
 
 #define RES_HEIGHT 1280
 #define RES_WIDTH 800
+#define PORT 8000
+#define HOST "localhost"
 
 class ofApp : public ofBaseApp{
 
@@ -76,7 +79,13 @@ class ofApp : public ofBaseApp{
     int lastTimer = 0;
     int lastTimerThres = 200;
     int scanLineHeight = 100;
-        
+    
+    
+    bool flash = false;
+    bool doFlash = true;
+    float flashTimer = 0;
+    float flashTimerThres = 10;
+    
     bool bDebug = true;
   //  bool debugAction = true;
     
@@ -119,6 +128,7 @@ class ofApp : public ofBaseApp{
     
     ofFbo mainRender; 
     
-    
+    ofxOscMessage msg;
+    ofxOscSender sender;
    
 };

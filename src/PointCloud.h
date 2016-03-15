@@ -10,6 +10,7 @@
 #include "ofxKinectV2.h"
 #include "DetectBody.h"
 #include "ofxAutoReloadedShader.h"
+#include "ofxOsc.h"
 
 #define RES_HEIGHT 1280
 #define RES_WIDTH 800
@@ -25,7 +26,7 @@ public:
     int collapse = 0;
     int translateX,translateY,translateZ;
     float tilt;
-    
+    ofxOscSender *sender;
     
     vector<ofVec3f> vel;
     vector<bool> bol;
@@ -147,6 +148,7 @@ public:
                 if(p[i].y > floor){
                     vel[i].y *= -ofRandom(.5,.7);
                     p[i].y = floor;
+                    
                 }
             }
         }

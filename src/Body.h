@@ -8,6 +8,7 @@
 
 #include "ofMain.h"
 #include "ofxCV.h"
+#include "ofxOsc.h"
 
 #define RES_HEIGHT 1280
 #define RES_WIDTH 800
@@ -42,8 +43,6 @@ public:
         ofDrawEllipse(centroid.x, centroid.y, 50, 50);
     };
     
-    
-    
 };
 
 
@@ -62,9 +61,11 @@ public:
     ofImage img2;
     ofColor color;
     ofTrueTypeFont *font;
+    
+    ofxOscSender *sender;
 
     int counter = 0;
-    bool hasConnection = true;
+    bool hasConnection = false;
     
     int alpha = 0;
     ofRectangle *rect = new ofRectangle;
@@ -164,6 +165,7 @@ public:
         // counter for alpha value- hasConnection controlled by dataPoints
         if(hasConnection && alpha < 230){
             alpha +=5;
+            
         }else if(!hasConnection && alpha >0){
             alpha -=5;
         }
@@ -208,6 +210,9 @@ public:
     float tlAlpha;
     float tlLength;
     
+    ofxOscSender *sender;
+
+    
     ofVec2f att;
     ofTrueTypeFont *font;
     
@@ -221,6 +226,20 @@ public:
             tlAlpha+=0.01;
         } else if (!bAlpha && tlAlpha > 0){
             tlAlpha -= 0.01;
+        }
+        
+        //send beginning to appear and disappered. 
+        if(bAlpha && tlAlpha == 0.01){
+            ofxOscMessage m;
+            m.setAddress("/dataPoint");
+            m.addIntArg(1);
+            sender->sendMessage(m);
+        }
+        if(!bAlpha && tlAlpha == 0){
+            ofxOscMessage m;
+            m.setAddress("/dataPoint");
+            m.addIntArg(0);
+            sender->sendMessage(m);
         }
         //cout << "alpha: "<< alpha << " tlAlpha: " << tlAlpha << endl;
         
@@ -242,7 +261,7 @@ public:
                     ofVec2f d = pos.getInterpolated(posAct, (float)shooter/100);
                     
                     ofSetColor(255);
-                    if(tlLength >= 1) ofDrawEllipse(d.x,d.y,2,2);
+                    if(tlLength >= 1) ofDrawEllipse(d.x,d.y,1,1);
                     // ofDrawEllipse(e.x,e.y,2,2);
                     
                     ofSetColor(255,tlAlpha*100);

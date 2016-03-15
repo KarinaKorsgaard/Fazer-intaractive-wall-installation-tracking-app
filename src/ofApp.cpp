@@ -3,6 +3,7 @@
 #include "DetectBody.h"
 #include "ofxCv.h"
 
+
 using namespace cv;
 
 
@@ -11,6 +12,8 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofSetFrameRate(30);
     ofEnableAntiAliasing();
+    
+    sender.setup(HOST,PORT);
     
     // LOAD FONTS & IMAGES
     ofTrueTypeFont::setGlobalDpi(72);
@@ -59,6 +62,7 @@ void ofApp::setup(){
         actor.vel = ofVec2f(0,0);
         actor.color = ofColor(ofRandom(80-100),ofRandom(80-100),ofRandom(100,255));
         actor.font = &font;
+        actor.sender = &sender;
         actor.orgPos = ofVec2f(800/9*xPos[i], 1280/18*yPos[i]);
         actors.push_back(actor);
         
@@ -72,7 +76,7 @@ void ofApp::setup(){
         dPoint.actors = &actors;
         string name = csv.getString(i, 0);
         dPoint.Name = name;
-        
+        dPoint.sender = &sender;
         dPoint.pos.x = ofRandom(RES_WIDTH);
         dPoint.pos.y = ofRandom(RES_HEIGHT);
         dPoint.shooter = int(ofRandom(100));
@@ -90,6 +94,7 @@ void ofApp::setup(){
     }
     //csv----------------------------end
     
+    pointCloud.sender = &sender;
     
     kinect.open(); // GeForce on MacBookPro Retina
     
@@ -148,13 +153,10 @@ void ofApp::update(){
     pointCloud.translateZ = translateZ;
     pointCloud.floor = floor;
     
-   // detectPerson();
-   // timeLine();
+    detectPerson();
+    timeLine();
     
-    if(setPositions){
-        positions();
-        setPositions = false;
-    }
+
     
     // update the actors / big players
     for(int i = 0; i< actors.size();i++){
@@ -258,6 +260,17 @@ void ofApp::update(){
         }
         
     }
+    
+    if(flash && doFlash){
+        if(flashTimer < flashTimerThres/3){
+            ofSetColor(flashTimer*(255/flashTimerThres));
+        }
+        if(flashTimer < flashTimerThres/3){
+            ofSetColor((flashTimerThres-flashTimer)*(255/flashTimerThres));
+        }
+        ofDrawRectangle(0, 0, RES_WIDTH, RES_HEIGHT);
+    }
+    
     mainRender.end();
     
 }
@@ -398,7 +411,10 @@ void ofApp::keyPressed(int key){
         actorsFixed = !actorsFixed;
     }
     if(key == 'p'){
-        setPositions = true;
+        isPersonPresent = true;
+    }
+    if(key == 'f'){
+        doFlash = !doFlash;
     }
 
     
@@ -478,6 +494,8 @@ void ofApp::positions(){
         }
     }
     
+    
+    
    // random_shuffle(unifDistPoints.begin(), unifDistPoints.end()); // shuffle the points
     
 //    for( int i = 0; i < unifDistPoints.size() && i < datapoints.size(); i++){
@@ -513,38 +531,67 @@ void ofApp::detectPerson(){
 }
 //--------------------------------------------------------------
 void ofApp::timeLine(){
-    //if person is present for more than 100 frames -> start scanDown
+    
+    //reset timer if person leaves
+    if(!isPersonPresent){
+        isPPtimer=0;
+    }
+    
+    //if person is present for more than 100 frames -> start scanDown or flash
     if(isPersonPresent && !active){
         isPPtimer++;
         if(isPPtimer>isPPthres){
-            scanDown = true;
+            ofxOscMessage m;
+            if(!doFlash){
+                scanDown = true;
+                m.setAddress("/scanUp");
+            }
+            if(doFlash){
+                flash = true;
+                m.setAddress("/flash");
+                scanLine = RES_HEIGHT;
+            }
+            
             active = true;
+            m.addIntArg(1);
+            sender.sendMessage(m);
         }
-    }
-    //reset timer is person leaves
-    if(!isPersonPresent){
-        isPPtimer=0;
     }
     
     // if scanline is down, scan go up.
     if(scanDown){
         scanLine +=15;
-        if(scanLine > RES_HEIGHT){
+        if(scanLine > RES_HEIGHT){ // start scanUp
             scanUp = true;
             scanDown = false;
             positions();
+            
+            ofxOscMessage m;
+            m.setAddress("/scanUp");
+            m.addIntArg(1);
+            sender.sendMessage(m);
         }
     }
     
-    // if person leaves while scanning down, reset all.
-    if(scanDown && !isPersonPresent){
-        resetAll = true;
+    if(flash){ // start flash
+        flashTimer ++;
+        if(flashTimer > flashTimerThres){ // start scanUp
+            scanUp =true;
+            flash = false;
+            positions();
+            
+            ofxOscMessage m;
+            m.setAddress("/scanUp");
+            m.addIntArg(1);
+            sender.sendMessage(m);
+        }
     }
     
     // scan up- set datapoints positions, freese PC (updatePC) // when up, keep datapoints (freeze)
     if(scanUp){
         updatePC = false;
         scanLine -=5;
+        
         if(scanLine < 0){
             for(int i = 0; i<datapoints.size();i++){
                 // length ->start length counter.
@@ -564,6 +611,11 @@ void ofApp::timeLine(){
         if(endTimer>endTimerThres || !isPersonPresent){
             startFall = true;
             ending = false;
+            
+            ofxOscMessage m;
+            m.setAddress("/fall");
+            m.addIntArg(1);
+            sender.sendMessage(m);
         }
     }
     
@@ -580,15 +632,39 @@ void ofApp::timeLine(){
         }
         if(lastTimer >lastTimerThres){
             resetAll = true;
+            
+            ofxOscMessage m;
+            m.setAddress("/stopAll");
+            m.addIntArg(1);
+            sender.sendMessage(m);
         }
     }
     
+    // if person leaves while scanning down, reset all.
+    if(scanDown && !isPersonPresent){
+        resetAll = true;
+        
+        ofxOscMessage m;
+        m.setAddress("/stopAll");
+        m.addIntArg(1);
+        sender.sendMessage(m);
+    }
     
+    // if person leaves while flash down, reset all.
+    if(flash && !isPersonPresent){
+        resetAll = true;
+        
+        ofxOscMessage m;
+        m.setAddress("/stopAll");
+        m.addIntArg(1);
+        sender.sendMessage(m);
+    }
     
     
     //reset all timers, bools and datapoints
     if(resetAll ){
-        
+        flash=false;
+        flashTimer=0;
         lastTimer = 0;
         endTimer = 0;
         scanLine = 0;
