@@ -256,10 +256,13 @@ void ofApp::update(){
                 if(scanLine>0){
                     datapoints[i].bAlpha = true;
                     
-                    ofxOscMessage m;
-                    m.setAddress("/datapoints");
-                    m.addIntArg(1);
-                    sender.sendMessage(m);
+                    if(datapoints[i].sendOsc){
+                        ofxOscMessage m;
+                        m.setAddress("/datapoints");
+                        m.addIntArg(1);
+                        sender.sendMessage(m);
+                        datapoints[i].sendOsc = false;
+                    }
                 
                 } // needed to make them disapear in fall
                 datapoints[i].draw();
@@ -737,6 +740,7 @@ void ofApp::timeLine(){
             datapoints[i].tlAlpha = 0;
             datapoints[i].tlLength = 0;
             datapoints[i].fall = false;
+            datapoints[i].sendOsc = true;
         }
         active = false;
     }

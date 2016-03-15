@@ -211,7 +211,7 @@ public:
     bool bLength = false;
     float tlAlpha;
     float tlLength;
-    
+    bool sendOsc = true; 
     ofxOscMessage m;
 
     
