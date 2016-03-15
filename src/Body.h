@@ -55,6 +55,7 @@ public:
     string Name;
     // float posX,posY;
     ofVec2f pos;
+    ofVec2f orgPos;
     ofVec2f vel;
     float size = 50;
     ofImage img;
@@ -63,13 +64,13 @@ public:
     ofTrueTypeFont *font;
 
     int counter = 0;
-    bool hasConnection = false;
+    bool hasConnection = true;
     
     int alpha = 0;
     ofRectangle *rect = new ofRectangle;
     
     float friction = -0.98;
-    float gravity = 0;//-0.02;
+    float gravity = -0.02;
     float spring = 0.03;
     
   
@@ -99,6 +100,12 @@ public:
     
     void update(){
         
+        float boundaryXH = RES_WIDTH - size/2;
+        float boundaryYH = RES_HEIGHT - size/2;
+        float boundaryXL = size/2;
+        float boundaryYL = size/2;
+        
+        
         // bounce of body bounding box set in void detectPerson();
         // top:
         if(pos.x>rect->x && pos.x<rect->x+rect->width && pos.y> rect->y){
@@ -117,20 +124,20 @@ public:
         }
         
         //bounce of walls
-        if(pos.x>RES_WIDTH-size/2){
-            pos.x= RES_WIDTH-size/2;
+        if(pos.x>boundaryXH){
+            pos.x= boundaryXH;
             vel*=friction;
         }
-        if(pos.x<size/2){
-            pos.x= size/2;
+        if(pos.x<boundaryXL){
+            pos.x= boundaryXL;
             vel*=friction;
         }
-        if(pos.y>RES_HEIGHT-size/2){
-            pos.y= RES_HEIGHT-size/2;
+        if(pos.y>boundaryYH){
+            pos.y =boundaryYH;
             vel*=-1; // no friction on ceiling
         }
-        if(pos.y<size/2){
-            pos.y= size/2;
+        if(pos.y<boundaryYL){
+            pos.y=boundaryYL;
             vel*=friction;
         }
         
@@ -141,16 +148,17 @@ public:
         if(pos.x < size/2 && pos.y < size/2){
             vel.set(1,1);
         }
-        
+//
         // min vel = 0.5
         if(vel.length() <0.5){
             vel *= 1.2;
         }
-        
+//
         // add gravity (gravity = 0 atm)
         if(pos.y>RES_HEIGHT/2){
             vel.y += gravity;
         }
+        
         pos+=vel;
         
         // counter for alpha value- hasConnection controlled by dataPoints
@@ -159,8 +167,6 @@ public:
         }else if(!hasConnection && alpha >0){
             alpha -=5;
         }
-
-        
     }
     void drawUC(){
             float w = size;
@@ -252,15 +258,21 @@ public:
             ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
             ofRectangle myRect;
             int frame = 6;
-            myRect.x = pos.x-frame-rect.width/2;
+            
+            myRect.x = pos.x-frame*2;//-rect.width/2;
             myRect.y = pos.y-frame-rect.height/2;
             myRect.width = rect.width+frame*2;
             myRect.height = rect.height+frame*2;
-            ofDrawRectRounded(myRect, 5);
-            ofSetColor(255,tlAlpha*255);
-            font->drawString(Name,pos.x-rect.width/2,pos.y+frame);
-            // draw dataPoints_end
             
+            ofDrawRectRounded(myRect, 5);
+            
+            ofSetColor(255,tlAlpha*255);
+            font->drawString(Name,pos.x-frame/*-rect.width/2*/,pos.y+frame);
+            // draw dataPoints_end
+            ofSetColor(255, 0, 0);
+            ofDrawCircle(pos,3);
+            ofSetColor(255, 0, 255);
+            ofDrawCircle(pos.x+rect.width,pos.y,3);
             
             if(fall){
                 bLength = false;

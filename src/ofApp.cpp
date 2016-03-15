@@ -49,6 +49,8 @@ void ofApp::setup(){
         logo.load(str);
         actor.img2 = logo;
         
+        int xPos[10] = {1, 1, 1, 1, 3, 6, 8, 8, 8, 8}; // 9 subdivisions
+        int yPos[10] = {12, 9, 6, 3, 1, 1, 3, 6, 9, 12}; // 18 Subdivisions
         
         actor.pos.x = ofRandom(RES_WIDTH);
         actor.pos.y = ofRandom(RES_HEIGHT);
@@ -57,18 +59,23 @@ void ofApp::setup(){
         actor.vel = ofVec2f(0,0);
         actor.color = ofColor(ofRandom(80-100),ofRandom(80-100),ofRandom(100,255));
         actor.font = &font;
-        
+        actor.orgPos = ofVec2f(800/9*xPos[i], 1280/18*yPos[i]);
         actors.push_back(actor);
         
     }
+    
+
+    
     
     for(int i=1; i<csv.numRows; i++) {
         DataPoint dPoint;
         dPoint.actors = &actors;
         string name = csv.getString(i, 0);
         dPoint.Name = name;
+        
         dPoint.pos.x = ofRandom(RES_WIDTH);
         dPoint.pos.y = ofRandom(RES_HEIGHT);
+        dPoint.shooter = int(ofRandom(100));
         dPoint.font = &font;
         
         for(int u=1; u<csv.numCols; u++) {
@@ -141,9 +148,13 @@ void ofApp::update(){
     pointCloud.translateZ = translateZ;
     pointCloud.floor = floor;
     
-    detectPerson();
-    timeLine();
+   // detectPerson();
+   // timeLine();
     
+    if(setPositions){
+        positions();
+        setPositions = false;
+    }
     
     // update the actors / big players
     for(int i = 0; i< actors.size();i++){
@@ -233,7 +244,7 @@ void ofApp::update(){
     
     if(scanUp||freeze){
         for(int i = 0; i< datapoints.size();i++ ){
-            if(datapoints[i].isSet && datapoints[i].pos.y > scanLine){
+            if(datapoints[i].isSet   && datapoints[i].pos.y > scanLine){
                 if(scanLine>0)datapoints[i].bAlpha = true; // needed to make them disapear in fall
                 datapoints[i].draw();
             }
@@ -346,7 +357,7 @@ void ofApp::draw(){
         ofSetWindowTitle("FrameRate: "+ ofToString(ofGetFrameRate()));
     }
     
-    
+
     
 };
 
@@ -386,6 +397,10 @@ void ofApp::keyPressed(int key){
     if(key == 'a'){
         actorsFixed = !actorsFixed;
     }
+    if(key == 'p'){
+        setPositions = true;
+    }
+
     
     if(key == '1') {
         imgIndx = 1;
@@ -415,6 +430,8 @@ void ofApp::keyPressed(int key){
 //--------------------------------------------------------------
 void ofApp::positions(){
     
+    random_shuffle(datapoints.begin(), datapoints.end()); // shuffle the points
+    
     //set datapoints positions when scanLine is down
     for(int i = 0; i<datapoints.size();i++){
         datapoints[i].isSet = false;
@@ -424,32 +441,49 @@ void ofApp::positions(){
     contourPC = getBodyPoly();
     
     ofRectangle cBndBox = contourPC.getBoundingBox();
+   // ofRectangle cBndBox = ofRectangle(0, 0, 500, 500);
     
+    int wordH= font.getStringBoundingBox(datapoints[0].Name,0,0).height+12;
     int stepY = cBndBox.getHeight()/23;
+    if(stepY <  wordH)stepY = wordH;
     
     vector<ofPoint> unifDistPoints;
     int d = 0;
+    int stepX = 1;//cBndBox.getWidth()/3;
+    
     for (int iY=0; iY < cBndBox.getHeight(); iY+=stepY ){
-        d++;
+        
+        
+        
         int stepX = cBndBox.getWidth()/3;
-        if(d%2 == 1)stepX = cBndBox.getWidth()/4;
+        if(d%2 == 1){stepX = cBndBox.getWidth()/4;}
+        
         
         for(int iX=0; iX< cBndBox.getWidth(); iX+=stepX ){
             ofPoint p;
             p.x = iX+cBndBox.x;
             p.y = iY+cBndBox.y;
-            if(contourPC.inside(p)){
+             if(contourPC.inside(p)){
+                datapoints[d].pos = p;
+                datapoints[d].isSet = true;
+                int wordWidth = font.getStringBoundingBox(datapoints[d].Name,0,0).width+14;
+                if(stepX<wordWidth)stepX = wordWidth;
+                d++;
+                d= d%datapoints.size();
+            
                 unifDistPoints.push_back(p);
+            
+            
             }
         }
     }
     
-    random_shuffle(unifDistPoints.begin(), unifDistPoints.end()); // shuffle the points
+   // random_shuffle(unifDistPoints.begin(), unifDistPoints.end()); // shuffle the points
     
-    for( int i = 0; i < unifDistPoints.size() && i < datapoints.size(); i++){
-        datapoints[i].pos = unifDistPoints[i];
-        datapoints[i].isSet = true;
-    }
+//    for( int i = 0; i < unifDistPoints.size() && i < datapoints.size(); i++){
+//        datapoints[i].pos = unifDistPoints[i];
+//        
+//    }
 }
 
 //--------------------------------------------------------------

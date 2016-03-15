@@ -78,6 +78,7 @@ class ofApp : public ofBaseApp{
     int scanLineHeight = 100;
         
     bool bDebug = true;
+  //  bool debugAction = true;
     
     bool circleLogo = false;
     bool actorsFixed = true;
