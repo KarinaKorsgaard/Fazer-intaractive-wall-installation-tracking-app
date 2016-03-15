@@ -83,7 +83,7 @@ class ofApp : public ofBaseApp{
     bool flash = false;
     bool doFlash = true;
     float flashTimer = 0;
-    float flashTimerThres = 10;
+    float flashTimerThres = 15;
     
     bool bDebug = true;
     bool debugAction = false;

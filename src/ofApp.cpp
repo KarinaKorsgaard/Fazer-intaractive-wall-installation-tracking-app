@@ -22,7 +22,7 @@ void ofApp::setup(){
     
     
     // font.load("Roboto.ttf", 12, true, true);
-    font.load("Calibre/Calibre-Semibold.otf", 20, true, true);
+    font.load("Calibre/Calibre-Semibold.otf", 17, true, true);
     
     // INITIALISE FBO
     mainRender.allocate(800,1280);
@@ -280,17 +280,21 @@ void ofApp::update(){
     }
     
     if(flash && doFlash){
-        if(flashTimer < flashTimerThres/3){
-            ofSetColor(flashTimer*(255/flashTimerThres));
+        if(flashTimer < flashTimerThres/4){ //fade up
+            ofSetColor((flashTimer*(255/flashTimerThres))*4);
         }
-        if(flashTimer < flashTimerThres/3){
-            ofSetColor((flashTimerThres-flashTimer)*(255/flashTimerThres));
+
+        if(flashTimer > flashTimerThres/4){ //fade down
+            ofSetColor(((flashTimerThres-flashTimer)*(255/flashTimerThres))*4);
         }
         ofDrawRectangle(0, 0, RES_WIDTH, RES_HEIGHT);
     }
     
     mainRender.end();
     
+    if(counter > 100 && !debugAction){
+        kinect.close();
+    }
     if(counter > 300 && !debugAction){
         ofExit();
     }
@@ -486,8 +490,8 @@ void ofApp::positions(){
    // ofRectangle cBndBox = ofRectangle(0, 0, 500, 500);
     if(debugAction) cBndBox = ofRectangle(0, 0, 500, 500);
     int wordH= font.getStringBoundingBox(datapoints[0].Name,0,0).height+22;
-    int stepY = cBndBox.getHeight()/23 + ofRandom(-5,5);
-    if(stepY <  wordH)stepY = wordH + ofRandom(-5,5);
+    int stepY = cBndBox.getHeight()/23 + ofRandom(-8,8);
+    if(stepY <  wordH)stepY = wordH + ofRandom(-8,8);
     
     vector<ofPoint> unifDistPoints;
     int d = 0;
@@ -498,7 +502,7 @@ void ofApp::positions(){
         
         
         int stepX = cBndBox.getWidth()/3;
-        if(d%2 == 1){stepX = cBndBox.getWidth()/4;}
+        if(d%2 == 0){stepX = cBndBox.getWidth()/4;}
         
         
         for(int iX=0; iX< cBndBox.getWidth(); iX+=stepX ){
@@ -579,7 +583,7 @@ void ofApp::timeLine(){
             }
             
             active = true;
-            m.addIntArg(1);
+            m.addIntArg(1); // start flash
             sender.sendMessage(m);
         }
     }
@@ -605,6 +609,14 @@ void ofApp::timeLine(){
             m.setAddress("/scanUp");
             m.addIntArg(1);
             sender.sendMessage(m);
+            
+            m.clear();
+            
+            if(doFlash){
+                m.setAddress("/flash"); // stop flash
+                m.addIntArg(0);
+                sender.sendMessage(m);
+            }
         }
     }
     
@@ -652,6 +664,11 @@ void ofApp::timeLine(){
         if(endTimer>endTimerThres || !isPersonPresent){
             startFall = true;
             ending = false;
+            
+            ofxOscMessage m;
+            m.setAddress("/network");
+            m.addIntArg(0); // stop network
+            sender.sendMessage(m);
             
         }
     }

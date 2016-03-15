@@ -257,7 +257,7 @@ public:
                     ofVec2f d = pos.getInterpolated(posAct, (float)shooter/100);
                     
                     ofSetColor(255);
-                    if(tlLength >= 1) ofDrawEllipse(d.x,d.y,1,1);
+                    if(tlLength >= 1) ofDrawEllipse(d.x,d.y,2,2);
                     // ofDrawEllipse(e.x,e.y,2,2);
                     
                     ofSetColor(255,tlAlpha*100);
@@ -273,7 +273,7 @@ public:
             ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
             ofRectangle myRect;
             int frame = 6;
-            int adjustR = 30;
+            int adjustR = 50;
             myRect.x = pos.x-frame*2 - adjustR;//-rect.width/2;
             myRect.y = pos.y-frame-rect.height/2;
             myRect.width = rect.width+frame*2;
@@ -282,7 +282,7 @@ public:
             ofDrawRectRounded(myRect, 5);
             
             ofSetColor(255,tlAlpha*255);
-            font->drawString(Name,pos.x-frame-adjustR,pos.y+frame+3);
+            font->drawString(Name,pos.x-frame-adjustR,pos.y+frame);
             // draw dataPoints_end
             
             if(fall){
