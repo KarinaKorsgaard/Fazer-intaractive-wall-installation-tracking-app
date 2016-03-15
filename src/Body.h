@@ -62,7 +62,7 @@ public:
     ofColor color;
     ofTrueTypeFont *font;
     
-    ofxOscSender *sender;
+    ofxOscMessage m;
 
     int counter = 0;
     bool hasConnection = false;
@@ -165,6 +165,8 @@ public:
         // counter for alpha value- hasConnection controlled by dataPoints
         if(hasConnection && alpha < 230){
             alpha +=5;
+
+            
             
         }else if(!hasConnection && alpha >0){
             alpha -=5;
@@ -210,7 +212,7 @@ public:
     float tlAlpha;
     float tlLength;
     
-    ofxOscSender *sender;
+    ofxOscMessage m;
 
     
     ofVec2f att;
@@ -223,24 +225,18 @@ public:
         
         //alpha counter
         if(bAlpha && tlAlpha<1){
-            tlAlpha+=0.01;
+            tlAlpha=1;
         } else if (!bAlpha && tlAlpha > 0){
             tlAlpha -= 0.01;
         }
         
         //send beginning to appear and disappered. 
-        if(bAlpha && tlAlpha == 0.01){
-            ofxOscMessage m;
-            m.setAddress("/dataPoint");
-            m.addIntArg(1);
-            sender->sendMessage(m);
-        }
-        if(!bAlpha && tlAlpha == 0){
-            ofxOscMessage m;
-            m.setAddress("/dataPoint");
-            m.addIntArg(0);
-            sender->sendMessage(m);
-        }
+//        if(bAlpha){
+//            m.clear();
+//            m.setAddress("/dataPoint_"+Name);
+//            m.addFloatArg(tlAlpha);
+//        }
+
         //cout << "alpha: "<< alpha << " tlAlpha: " << tlAlpha << endl;
         
         //start line length counter
@@ -286,12 +282,8 @@ public:
             ofDrawRectRounded(myRect, 5);
             
             ofSetColor(255,tlAlpha*255);
-            font->drawString(Name,pos.x-frame/*-rect.width/2*/,pos.y+frame);
+            font->drawString(Name,pos.x-frame/*-rect.width/2*/,pos.y+frame+3);
             // draw dataPoints_end
-            ofSetColor(255, 0, 0);
-            ofDrawCircle(pos,3);
-            ofSetColor(255, 0, 255);
-            ofDrawCircle(pos.x+rect.width,pos.y,3);
             
             if(fall){
                 bLength = false;

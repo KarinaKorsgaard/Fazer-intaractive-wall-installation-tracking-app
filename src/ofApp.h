@@ -13,7 +13,7 @@
 
 #define RES_HEIGHT 1280
 #define RES_WIDTH 800
-#define PORT 8000
+#define PORT 4321
 #define HOST "localhost"
 
 class ofApp : public ofBaseApp{
@@ -79,7 +79,7 @@ class ofApp : public ofBaseApp{
     int lastTimer = 0;
     int lastTimerThres = 200;
     int scanLineHeight = 100;
-    
+    bool debugAction = true;
     
     bool flash = false;
     bool doFlash = true;

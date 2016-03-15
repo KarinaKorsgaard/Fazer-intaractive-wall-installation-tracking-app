@@ -62,7 +62,6 @@ void ofApp::setup(){
         actor.vel = ofVec2f(0,0);
         actor.color = ofColor(ofRandom(80-100),ofRandom(80-100),ofRandom(100,255));
         actor.font = &font;
-        actor.sender = &sender;
         actor.orgPos = ofVec2f(800/9*xPos[i], 1280/18*yPos[i]);
         actors.push_back(actor);
         
@@ -76,7 +75,7 @@ void ofApp::setup(){
         dPoint.actors = &actors;
         string name = csv.getString(i, 0);
         dPoint.Name = name;
-        dPoint.sender = &sender;
+
         dPoint.pos.x = ofRandom(RES_WIDTH);
         dPoint.pos.y = ofRandom(RES_HEIGHT);
         dPoint.shooter = int(ofRandom(100));
@@ -153,7 +152,9 @@ void ofApp::update(){
     pointCloud.translateZ = translateZ;
     pointCloud.floor = floor;
     
-    detectPerson();
+    if(!debugAction){
+        detectPerson();
+    }
     timeLine();
     
 
@@ -247,8 +248,20 @@ void ofApp::update(){
     if(scanUp||freeze){
         for(int i = 0; i< datapoints.size();i++ ){
             if(datapoints[i].isSet   && datapoints[i].pos.y > scanLine){
-                if(scanLine>0)datapoints[i].bAlpha = true; // needed to make them disapear in fall
+                if(scanLine>0){
+                    datapoints[i].bAlpha = true;
+                    
+                    ofxOscMessage m;
+                    m.setAddress("/datapoints");
+                    m.addIntArg(1);
+                    sender.sendMessage(m);
+                
+                } // needed to make them disapear in fall
                 datapoints[i].draw();
+                
+                
+                
+                
             }
         }
     }
@@ -288,10 +301,7 @@ void ofApp::draw(){
     
     
     if(bDebug){
-        
-        
-        
-        
+    
         float scale = 0.75;
         
         // Draw the incoming depth image for the body detection.
@@ -410,8 +420,8 @@ void ofApp::keyPressed(int key){
     if(key == 'a'){
         actorsFixed = !actorsFixed;
     }
-    if(key == 'p'){
-        isPersonPresent = true;
+    if(key == 'p' && debugAction){
+        isPersonPresent = !isPersonPresent;
     }
     if(key == 'f'){
         doFlash = !doFlash;
@@ -458,10 +468,10 @@ void ofApp::positions(){
     
     ofRectangle cBndBox = contourPC.getBoundingBox();
    // ofRectangle cBndBox = ofRectangle(0, 0, 500, 500);
-    
-    int wordH= font.getStringBoundingBox(datapoints[0].Name,0,0).height+12;
-    int stepY = cBndBox.getHeight()/23;
-    if(stepY <  wordH)stepY = wordH;
+    if(debugAction) cBndBox = ofRectangle(0, 0, 500, 500);
+    int wordH= font.getStringBoundingBox(datapoints[0].Name,0,0).height+22;
+    int stepY = cBndBox.getHeight()/23 + ofRandom(-5,5);
+    if(stepY <  wordH)stepY = wordH + ofRandom(-5,5);
     
     vector<ofPoint> unifDistPoints;
     int d = 0;
@@ -479,7 +489,7 @@ void ofApp::positions(){
             ofPoint p;
             p.x = iX+cBndBox.x;
             p.y = iY+cBndBox.y;
-             if(contourPC.inside(p)){
+             if(contourPC.inside(p)||debugAction){
                 datapoints[d].pos = p;
                 datapoints[d].isSet = true;
                 int wordWidth = font.getStringBoundingBox(datapoints[d].Name,0,0).width+14;
@@ -544,7 +554,7 @@ void ofApp::timeLine(){
             ofxOscMessage m;
             if(!doFlash){
                 scanDown = true;
-                m.setAddress("/scanUp");
+                m.setAddress("/scanDown");
             }
             if(doFlash){
                 flash = true;
@@ -556,6 +566,15 @@ void ofApp::timeLine(){
             m.addIntArg(1);
             sender.sendMessage(m);
         }
+    }
+    
+    //
+    if(scanDown || scanUp){
+        ofxOscMessage m;
+        m.setAddress("/scanner");
+        float f = scanLine / RES_HEIGHT;
+        m.addFloatArg(f);
+        sender.sendMessage(m);
     }
     
     // if scanline is down, scan go up.
@@ -596,12 +615,18 @@ void ofApp::timeLine(){
             for(int i = 0; i<datapoints.size();i++){
                 // length ->start length counter.
                 datapoints[i].bLength = true;
+                
             }
             scanUp = false;
             freeze = true; // let dataPoints stay even if scanUp = false
             ending = true;
             pointCloud.vel.clear();
             pointCloud.collapse = RES_HEIGHT/2;
+            
+            ofxOscMessage m;
+            m.setAddress("/network");
+            m.addIntArg(1);
+            sender.sendMessage(m);
         }
     }
     
@@ -612,10 +637,6 @@ void ofApp::timeLine(){
             startFall = true;
             ending = false;
             
-            ofxOscMessage m;
-            m.setAddress("/fall");
-            m.addIntArg(1);
-            sender.sendMessage(m);
         }
     }
     
@@ -624,45 +645,43 @@ void ofApp::timeLine(){
         lastTimer ++;
         pointCloud.fall();
         
+        if(datapoints[0].tlAlpha>0){
+            ofxOscMessage m;
+            m.setAddress("/rain");
+            m.addFloatArg(datapoints[0].tlAlpha);
+            sender.sendMessage(m);
+        }
+        
         for(int i = 0; i< actors.size();i++){
             actors[i].hasConnection = false;
         }
         for(int i = 0; i<datapoints.size();i++){
             datapoints[i].fall=true;
         }
-        if(lastTimer >lastTimerThres){
+        if(lastTimer > lastTimerThres){
             resetAll = true;
-            
-            ofxOscMessage m;
-            m.setAddress("/stopAll");
-            m.addIntArg(1);
-            sender.sendMessage(m);
         }
     }
     
     // if person leaves while scanning down, reset all.
     if(scanDown && !isPersonPresent){
         resetAll = true;
-        
-        ofxOscMessage m;
-        m.setAddress("/stopAll");
-        m.addIntArg(1);
-        sender.sendMessage(m);
+    
     }
     
     // if person leaves while flash down, reset all.
     if(flash && !isPersonPresent){
         resetAll = true;
-        
-        ofxOscMessage m;
-        m.setAddress("/stopAll");
-        m.addIntArg(1);
-        sender.sendMessage(m);
     }
     
     
     //reset all timers, bools and datapoints
     if(resetAll ){
+        ofxOscMessage m;
+        m.setAddress("/stopAll");
+        m.addIntArg(1);
+        sender.sendMessage(m);
+        
         flash=false;
         flashTimer=0;
         lastTimer = 0;
