@@ -31,7 +31,6 @@ public:
     vector<ofVec3f> vel;
     vector<bool> bol;
     
-    ofFbo renderer;
     ofVbo vbo;
     ofxAutoReloadedShader shaderSplineReplace;
     ofTexture texSpline;

@@ -17,7 +17,10 @@ void ofApp::setup(){
     
     // LOAD FONTS & IMAGES
     ofTrueTypeFont::setGlobalDpi(72);
-    scanImage.load("scan.png");
+
+    
+    
+    
     // font.load("Roboto.ttf", 12, true, true);
     font.load("Calibre/Calibre-Semibold.otf", 20, true, true);
     
@@ -41,6 +44,8 @@ void ofApp::setup(){
         if(ofIsStringInString(name, "TWITTER")){
             str = "logo/TWITTER.png";
         }
+        
+        
         ofImage logo;
         logo.load(str);
         actor.img = logo;
@@ -51,7 +56,7 @@ void ofApp::setup(){
         }
         logo.load(str);
         actor.img2 = logo;
-        
+
         int xPos[10] = {1, 1, 1, 1, 3, 6, 8, 8, 8, 8}; // 9 subdivisions
         int yPos[10] = {12, 9, 6, 3, 1, 1, 3, 6, 9, 12}; // 18 Subdivisions
         
@@ -286,6 +291,10 @@ void ofApp::update(){
     
     mainRender.end();
     
+    if(counter > 300 && !debugAction){
+        ofExit();
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -362,8 +371,13 @@ void ofApp::draw(){
         ofDrawBitmapString(
                            string() +
                            "d - debugMode\n" +
+                           "a - actors fixed\n" +
+                           "q - debug Action \n" +
+                           "(if debugAction, you can force start timeline)\n" +
+                           "p - force start timeline\n" +
                            "s - switch Icons",
                            14, RES_HEIGHT - 10 * 12);
+        
         
         ofDrawBitmapString(string() +
                            "index of the detection Image\n" +
@@ -377,9 +391,9 @@ void ofApp::draw(){
                            14*15, RES_HEIGHT - 10 * 12);
         
         
-        ofSetWindowTitle("FrameRate: "+ ofToString(ofGetFrameRate()));
-    }
-    
+        }
+    ofSetWindowTitle("FrameRate: "+ ofToString(ofGetFrameRate()));
+
 
     
 };
@@ -426,7 +440,9 @@ void ofApp::keyPressed(int key){
     if(key == 'f'){
         doFlash = !doFlash;
     }
-
+    if(key == 'q'){
+        debugAction = !debugAction;
+    }
     
     if(key == '1') {
         imgIndx = 1;

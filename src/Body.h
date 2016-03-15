@@ -273,8 +273,8 @@ public:
             ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
             ofRectangle myRect;
             int frame = 6;
-            
-            myRect.x = pos.x-frame*2;//-rect.width/2;
+            int adjustR = 30;
+            myRect.x = pos.x-frame*2 - adjustR;//-rect.width/2;
             myRect.y = pos.y-frame-rect.height/2;
             myRect.width = rect.width+frame*2;
             myRect.height = rect.height+frame*2;
@@ -282,7 +282,7 @@ public:
             ofDrawRectRounded(myRect, 5);
             
             ofSetColor(255,tlAlpha*255);
-            font->drawString(Name,pos.x-frame/*-rect.width/2*/,pos.y+frame+3);
+            font->drawString(Name,pos.x-frame-adjustR,pos.y+frame+3);
             // draw dataPoints_end
             
             if(fall){

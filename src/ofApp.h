@@ -37,13 +37,12 @@ class ofApp : public ofBaseApp{
     ofxKinectV2 kinect;
     PointCloud pointCloud;
     DetectBody detectBody;
-    ofImage scanImage;
     
     ofTexture depthTex;
     ofxAutoReloadedShader depthShader;
     ofxAutoReloadedShader scanner;
     ofFbo depthFbo;
-    
+     ofFbo mainRender;
     
     ofFbo scanRender;
     ofFbo renderPC;
@@ -79,7 +78,7 @@ class ofApp : public ofBaseApp{
     int lastTimer = 0;
     int lastTimerThres = 200;
     int scanLineHeight = 100;
-    bool debugAction = true;
+    
     
     bool flash = false;
     bool doFlash = true;
@@ -87,6 +86,7 @@ class ofApp : public ofBaseApp{
     float flashTimerThres = 10;
     
     bool bDebug = true;
+    bool debugAction = false;
   //  bool debugAction = true;
     
     bool circleLogo = false;
@@ -126,7 +126,7 @@ class ofApp : public ofBaseApp{
     
     ofRectangle thePerson;
     
-    ofFbo mainRender; 
+    
     
     ofxOscMessage msg;
     ofxOscSender sender;
