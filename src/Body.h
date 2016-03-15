@@ -213,21 +213,24 @@ public:
     float tlLength;
     bool sendOsc = true; 
     ofxOscMessage m;
-
+    float lPos =0;
+    float lVel =0.05;
     
     ofVec2f att;
     ofTrueTypeFont *font;
     
     void draw(){
         
-        if(tlLength>0.95)shooter++;
+        //if(tlLength>0.95)
+        shooter++;
         shooter = shooter%100;
         
         //alpha counter
         if(bAlpha && tlAlpha<1){
             tlAlpha=1;
         } else if (!bAlpha && tlAlpha > 0){
-            tlAlpha -= 0.01;
+            tlAlpha -= lPos;
+            lPos += lVel;
         }
         
         //send beginning to appear and disappered. 
@@ -241,9 +244,9 @@ public:
         
         //start line length counter
         if(bLength && tlLength<1.){
-            tlLength+=0.01;
+            tlLength+=0.03;
         } else if (!bLength && tlLength > 0){
-            tlLength-=0.01;
+            tlLength-=0.05;
         }
         
         if(tlAlpha>0){
@@ -273,7 +276,7 @@ public:
             ofRectangle rect = font->getStringBoundingBox(Name, 0,0);
             ofRectangle myRect;
             int frame = 6;
-            int adjustR = 50;
+            int adjustR = 30;
             myRect.x = pos.x-frame*2 - adjustR;//-rect.width/2;
             myRect.y = pos.y-frame-rect.height/2;
             myRect.width = rect.width+frame*2;

@@ -70,22 +70,24 @@ class ofApp : public ofBaseApp{
     int isPPthres = 90; // number of frames befor scanline -> 90 = 3sec
     bool ending = false;
     int endTimer = 0;
-    int endTimerThres = 600;
+    int endTimerThres = 150;
     bool endAnimation = false;
     bool resetAll = false;
     bool active = false;
     bool startFall = false;
     int lastTimer = 0;
-    int lastTimerThres = 200;
+    int lastTimerThres = 90;
     int scanLineHeight = 100;
     
+    float scVel = 1.5;
+    float scPos = 0;
     
     bool flash = false;
     bool doFlash = true;
     float flashTimer = 0;
-    float flashTimerThres = 15;
+    float flashTimerThres = 10;
     
-    bool bDebug = true;
+    bool bDebug = false;
     bool debugAction = false;
   //  bool debugAction = true;
     

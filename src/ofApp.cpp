@@ -22,7 +22,7 @@ void ofApp::setup(){
     
     
     // font.load("Roboto.ttf", 12, true, true);
-    font.load("Calibre/Calibre-Semibold.otf", 17, true, true);
+    font.load("Calibre/Calibre-Semibold.otf", 26, true, true);
     
     // INITIALISE FBO
     mainRender.allocate(800,1280);
@@ -80,7 +80,7 @@ void ofApp::setup(){
         dPoint.actors = &actors;
         string name = csv.getString(i, 0);
         dPoint.Name = name;
-
+        dPoint.lVel = ofRandom(0.01,0.05);
         dPoint.pos.x = ofRandom(RES_WIDTH);
         dPoint.pos.y = ofRandom(RES_HEIGHT);
         dPoint.shooter = int(ofRandom(100));
@@ -295,9 +295,7 @@ void ofApp::update(){
     
     mainRender.end();
     
-    if(counter > 100 && !debugAction){
-        kinect.close();
-    }
+
     if(counter > 300 && !debugAction){
         ofExit();
     }
@@ -308,7 +306,7 @@ void ofApp::update(){
 void ofApp::draw(){
     
     
-    mainRender.draw(0,0);
+    if(bDebug)mainRender.draw(0,0);
     ofSetColor(255);
     ofFill();
     syphon.publishTexture(&mainRender.getTexture());
@@ -640,7 +638,8 @@ void ofApp::timeLine(){
     // scan up- set datapoints positions, freese PC (updatePC) // when up, keep datapoints (freeze)
     if(scanUp){
         updatePC = false;
-        scanLine -=5;
+        scanLine -=scPos;
+        scPos+=scVel;
         
         if(scanLine < 0){
             for(int i = 0; i<datapoints.size();i++){
@@ -734,12 +733,14 @@ void ofApp::timeLine(){
         endAnimation = false;
         resetAll = false;
         startFall = false;
+        scPos = 0;
         for(int i = 0; i< datapoints.size();i++){
             datapoints[i].bLength = false;
             datapoints[i].bAlpha = false;
             datapoints[i].tlAlpha = 0;
             datapoints[i].tlLength = 0;
             datapoints[i].fall = false;
+            datapoints[i].lPos = 0;
             datapoints[i].sendOsc = true;
         }
         active = false;

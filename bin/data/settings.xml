@@ -9,10 +9,10 @@
 		<scaleY>0</scaleY>
 		<scaleZ>0</scaleZ>
 		<rotate>0</rotate>
-	<edge>299.429</edge>
-		<topDepth>2693.88</topDepth>
-		<botDepth>1346.94</botDepth>
-		<edgeDepth>3265.31</edgeDepth>
+	<edge>403.694</edge>
+		<topDepth>2000</topDepth>
+		<botDepth>2285.71</botDepth>
+		<edgeDepth>3102.04</edgeDepth>
 	</imageSetup>
 	<group/>
 	<tilt>0</tilt>
@@ -28,16 +28,16 @@
 	<thresX>277</thresX>
 		<thresY>254</thresY>
 	<floor>2530</floor>
-	<bPosX>227</bPosX>
-		<thresW>235</thresW>
-		<bPosY>198</bPosY>
-		<thresH>211</thresH>
+	<bPosX>266</bPosX>
+		<thresW>287</thresW>
+		<bPosY>203</bPosY>
+		<thresH>130</thresH>
 	</testParams>
 	<pointCloudSetup>
-		<tilt>-3.57143</tilt>
+		<tilt>-3.35714</tilt>
 		<translateX>306</translateX>
-		<translateY>-857</translateY>
-		<translateZ>-1020</translateZ>
-	<floor>2204</floor>
+		<translateY>-1183</translateY>
+		<translateZ>-1591</translateZ>
+	<floor>1714</floor>
 	</pointCloudSetup>
 </group>
