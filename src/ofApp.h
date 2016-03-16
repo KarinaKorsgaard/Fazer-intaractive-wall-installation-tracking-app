@@ -44,7 +44,6 @@ class ofApp : public ofBaseApp{
     ofFbo depthFbo;
      ofFbo mainRender;
     
-    ofFbo scanRender;
     ofFbo renderPC;
     vector<DataPoint> datapoints;
     vector<Actor> actors;
@@ -57,7 +56,7 @@ class ofApp : public ofBaseApp{
     int bot = ofGetWidth();
     int imgIndx = 7;
     
-    
+    ofxOscBundle b;
     float scanLine;
     
     bool scanUp = false;
@@ -74,12 +73,15 @@ class ofApp : public ofBaseApp{
     bool endAnimation = false;
     bool resetAll = false;
     bool active = false;
+    
+    bool pScanActive = false;
+    
     bool startFall = false;
     int lastTimer = 0;
-    int lastTimerThres = 90;
+    int lastTimerThres = 180;
     int scanLineHeight = 100;
     
-    float scVel = 1.5;
+    float scVel = 1.1;
     float scPos = 0;
     
     bool flash = false;
@@ -126,7 +128,7 @@ class ofApp : public ofBaseApp{
     ofParameter<int>   thresH;
     ofParameter<int>   floor;
     
-    ofRectangle thePerson;
+    //ofRectangle thePerson;
     
     
     

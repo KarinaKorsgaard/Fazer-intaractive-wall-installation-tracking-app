@@ -17,18 +17,26 @@ void ofApp::setup(){
     
     // LOAD FONTS & IMAGES
     ofTrueTypeFont::setGlobalDpi(72);
-
-    
-    
     
     // font.load("Roboto.ttf", 12, true, true);
     font.load("Calibre/Calibre-Semibold.otf", 26, true, true);
     
     // INITIALISE FBO
-    mainRender.allocate(800,1280);
+    mainRender.allocate(RES_WIDTH,RES_HEIGHT,GL_RGBA);
     mainRender.begin();
     ofClear(0);
     mainRender.end();
+    
+    
+    renderPC.allocate(RES_WIDTH,RES_HEIGHT,GL_RGBA);
+    renderPC.begin();
+    ofClear(0);
+    renderPC.end();
+    
+    depthFbo.allocate(512, 424, GL_R16);
+    depthFbo.begin();
+    ofClear(0);
+    depthFbo.end();
     
     // LOAD THE DATA FROM THE CVS-FILE
     //csv----------------------------
@@ -97,9 +105,7 @@ void ofApp::setup(){
         datapoints.push_back(dPoint);
     }
     //csv----------------------------end
-    
-    pointCloud.sender = &sender;
-    
+
     kinect.open(); // GeForce on MacBookPro Retina
     
     //kinect.start();
@@ -110,8 +116,7 @@ void ofApp::setup(){
     
     depthShader.load("depthshader/shader");
     scanner.load("depthshader/scan/shader");
-    renderPC.allocate(RES_WIDTH,RES_HEIGHT);
-    scanRender.allocate(RES_WIDTH,RES_HEIGHT);
+
     
     // Setup GUI
     imageSetup.setName("imageSetup");
@@ -167,7 +172,7 @@ void ofApp::update(){
     // update the actors / big players
     for(int i = 0; i< actors.size();i++){
         actors[i].update();
-        actors[i].rect = &thePerson;
+      //  actors[i].rect = &thePerson;
         for(int j = i+1; j< actors.size();j++){
             actors[i].checkCollision(&actors[j]);
         }
@@ -198,8 +203,9 @@ void ofApp::update(){
         depthTex.setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
         
         // Remove background and floor
-        depthFbo.allocate(512, 424, GL_R16);
+       // depthFbo.allocate(512, 424, GL_R16);
         depthFbo.begin();
+        ofClear(0);
         depthShader.begin();
         
         depthShader.setUniform1f("nearThreshold", nearThreshold);
@@ -284,11 +290,19 @@ void ofApp::update(){
     
     if(flash && doFlash){
         if(flashTimer < flashTimerThres/4){ //fade up
-            ofSetColor((flashTimer*(255/flashTimerThres))*4);
+            int a = (flashTimer*(255/flashTimerThres))*4;
+            if (a>255) {
+                a=255;
+            }
+            ofSetColor(a);
         }
 
         if(flashTimer > flashTimerThres/4){ //fade down
-            ofSetColor(((flashTimerThres-flashTimer)*(255/flashTimerThres))*4);
+            int a =((flashTimerThres-flashTimer)*(255/flashTimerThres))*4;
+            if (a>255) {
+                a=255;
+            }
+            ofSetColor(a);
         }
         ofDrawRectangle(0, 0, RES_WIDTH, RES_HEIGHT);
     }
@@ -297,7 +311,11 @@ void ofApp::update(){
     
 
     if(counter > 300 && !debugAction){
-        ofExit();
+        ofxOscMessage m;
+        m.setAddress("/fuck");
+        m.addIntArg(1);
+        b.addMessage(m);
+
     }
     
 }
@@ -399,7 +417,8 @@ void ofApp::draw(){
         }
     ofSetWindowTitle("FrameRate: "+ ofToString(ofGetFrameRate()));
 
-
+    sender.sendBundle(b);
+    b.clear();
     
 };
 
@@ -492,20 +511,16 @@ void ofApp::positions(){
     if(debugAction) cBndBox = ofRectangle(0, 0, 500, 500);
     int wordH= font.getStringBoundingBox(datapoints[0].Name,0,0).height+22;
     int stepY = cBndBox.getHeight()/23 + ofRandom(-8,8);
-    if(stepY <  wordH)stepY = wordH + ofRandom(-8,8);
+    if(stepY <  wordH)stepY = wordH + ofRandom(-15,15);
     
-    vector<ofPoint> unifDistPoints;
     int d = 0;
     int stepX = 1;//cBndBox.getWidth()/3;
     
     for (int iY=0; iY < cBndBox.getHeight(); iY+=stepY ){
-        
-        
-        
+
         int stepX = cBndBox.getWidth()/3;
         if(d%2 == 0){stepX = cBndBox.getWidth()/4;}
-        
-        
+
         for(int iX=0; iX< cBndBox.getWidth(); iX+=stepX ){
             ofPoint p;
             p.x = iX+cBndBox.x;
@@ -518,21 +533,9 @@ void ofApp::positions(){
                 d++;
                 d= d%datapoints.size();
             
-                unifDistPoints.push_back(p);
-            
-            
             }
         }
     }
-    
-    
-    
-   // random_shuffle(unifDistPoints.begin(), unifDistPoints.end()); // shuffle the points
-    
-//    for( int i = 0; i < unifDistPoints.size() && i < datapoints.size(); i++){
-//        datapoints[i].pos = unifDistPoints[i];
-//        
-//    }
 }
 
 //--------------------------------------------------------------
@@ -553,10 +556,8 @@ void ofApp::detectPerson(){
                 contourPC = getBodyPoly();
                 
                 //make rect of boundingbox to pass to actors
-                thePerson = ofRectangle(contourPC.getBoundingBox().x,contourPC.getBoundingBox().y, contourPC.getBoundingBox().width, contourPC.getBoundingBox().height);
+               // thePerson = ofRectangle(contourPC.getBoundingBox().x,contourPC.getBoundingBox().y, contourPC.getBoundingBox().width, contourPC.getBoundingBox().height);
             }
-        } else{
-            thePerson  = ofRectangle(0,0,0,0);
         }
     }
 }
@@ -566,10 +567,14 @@ void ofApp::timeLine(){
     //reset timer if person leaves
     if(!isPersonPresent){
         isPPtimer=0;
+        if (!pScanActive) {
+            pScanActive = true; // no loop
+        }
     }
     
     //if person is present for more than 100 frames -> start scanDown or flash
     if(isPersonPresent && !active){
+        pScanActive = false; // Enabling pause scan
         isPPtimer++;
         if(isPPtimer>isPPthres){
             ofxOscMessage m;
@@ -585,7 +590,8 @@ void ofApp::timeLine(){
             
             active = true;
             m.addIntArg(1); // start flash
-            sender.sendMessage(m);
+            b.addMessage(m);
+        
         }
     }
     
@@ -595,7 +601,7 @@ void ofApp::timeLine(){
         m.setAddress("/scanner");
         float f = scanLine / RES_HEIGHT;
         m.addFloatArg(f);
-        sender.sendMessage(m);
+        b.addMessage(m);
     }
     
     // if scanline is down, scan go up.
@@ -609,14 +615,14 @@ void ofApp::timeLine(){
             ofxOscMessage m;
             m.setAddress("/scanUp");
             m.addIntArg(1);
-            sender.sendMessage(m);
+            b.addMessage(m);
             
             m.clear();
             
             if(doFlash){
                 m.setAddress("/flash"); // stop flash
                 m.addIntArg(0);
-                sender.sendMessage(m);
+                b.addMessage(m);
             }
         }
     }
@@ -631,7 +637,7 @@ void ofApp::timeLine(){
             ofxOscMessage m;
             m.setAddress("/scanUp");
             m.addIntArg(1);
-            sender.sendMessage(m);
+            b.addMessage(m);
         }
     }
     
@@ -656,7 +662,7 @@ void ofApp::timeLine(){
             ofxOscMessage m;
             m.setAddress("/network");
             m.addIntArg(1);
-            sender.sendMessage(m);
+            b.addMessage(m);
         }
     }
     
@@ -665,12 +671,17 @@ void ofApp::timeLine(){
         endTimer++;
         if(endTimer>endTimerThres || !isPersonPresent){
             startFall = true;
+            
+            for(int i = 0; i<datapoints.size();i++){
+                datapoints[i].fall=true;
+            }
+            
             ending = false;
             
             ofxOscMessage m;
             m.setAddress("/network");
             m.addIntArg(0); // stop network
-            sender.sendMessage(m);
+            b.addMessage(m);
             
         }
     }
@@ -680,19 +691,18 @@ void ofApp::timeLine(){
         lastTimer ++;
         pointCloud.fall();
         
+        for(int i = 0; i< actors.size();i++){
+            actors[i].hasConnection = false;
+        }
+        
         if(datapoints[0].tlAlpha>0){
             ofxOscMessage m;
             m.setAddress("/rain");
             m.addFloatArg(datapoints[0].tlAlpha);
-            sender.sendMessage(m);
+            b.addMessage(m);
         }
         
-        for(int i = 0; i< actors.size();i++){
-            actors[i].hasConnection = false;
-        }
-        for(int i = 0; i<datapoints.size();i++){
-            datapoints[i].fall=true;
-        }
+        
         if(lastTimer > lastTimerThres){
             resetAll = true;
         }
@@ -715,7 +725,7 @@ void ofApp::timeLine(){
         ofxOscMessage m;
         m.setAddress("/stopAll");
         m.addIntArg(1);
-        sender.sendMessage(m);
+        b.addMessage(m);
         
         flash=false;
         flashTimer=0;
@@ -756,6 +766,7 @@ ofPolyline ofApp::getBodyPoly(){
         cv::Mat contourPCMat;
         contourPCMat = cv::Mat::zeros( cvSize(RES_WIDTH,RES_HEIGHT), CV_8U );
         ofPixels imagePC;
+        if(renderPC.isAllocated()){
         renderPC.readToPixels(imagePC);
         ofxCv::toCv(imagePC).convertTo(contourPCMat, CV_8UC1);
         
@@ -765,7 +776,7 @@ ofPolyline ofApp::getBodyPoly(){
         bitwise_not(contourPCMat, contourPCMat);
         ofxCv::ContourFinder contourFindPC;
         contourFindPC.setSortBySize(true);
-        contourFindPC.findContours(contourPCMat);
+        if(contourPCMat.size>0)contourFindPC.findContours(contourPCMat);
         
         if(bDebug){
             ofxCv::toOf(contourPCMat, contourDetectImg);
@@ -773,9 +784,8 @@ ofPolyline ofApp::getBodyPoly(){
         }
         
         if(contourFindPC.getPolylines().size()>0){
-            
             p = contourFindPC.getPolyline(0);
-        }
+        }}
     }
     return p;
 }

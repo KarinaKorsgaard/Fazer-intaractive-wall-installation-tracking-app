@@ -26,7 +26,7 @@ public:
     int collapse = 0;
     int translateX,translateY,translateZ;
     float tilt;
-    ofxOscSender *sender;
+
     
     vector<ofVec3f> vel;
     vector<bool> bol;

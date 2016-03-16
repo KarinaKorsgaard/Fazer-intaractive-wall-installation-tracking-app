@@ -1,11 +1,11 @@
 void main() {
 
     //gl_Position   = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_PointSize  = 5.0;
+    gl_PointSize  = 10.0;
     gl_FrontColor = gl_Color;
     
     
-    float spriteSize = 10.5;
+    float spriteSize = 11.5;
     vec2 screenSize = vec2(800., 1280.);
     
     vec4 eyePos = gl_ModelViewMatrix * gl_Vertex;

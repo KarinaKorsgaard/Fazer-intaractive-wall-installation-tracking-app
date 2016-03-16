@@ -62,13 +62,13 @@ public:
     ofColor color;
     ofTrueTypeFont *font;
     
-    ofxOscMessage m;
+
 
     int counter = 0;
     bool hasConnection = false;
     
     int alpha = 0;
-    ofRectangle *rect = new ofRectangle;
+   // ofRectangle *rect = new ofRectangle;
     
     float friction = -0.98;
     float gravity = -0.02;
@@ -109,20 +109,20 @@ public:
         
         // bounce of body bounding box set in void detectPerson();
         // top:
-        if(pos.x>rect->x && pos.x<rect->x+rect->width && pos.y> rect->y){
-            pos.y = rect->y;
-            vel*=friction;
-        }
-        // side 1
-        if(pos.y>rect->y && pos.y<rect->y+rect->height && pos.x> rect->x){
-            pos.y = rect->y;
-            vel*=friction;
-        }
-        // side 2
-        if(pos.y>rect->y && pos.y<rect->y+rect->height && pos.x < rect->x + rect->width){
-            pos.y = rect->y;
-            vel*=friction;
-        }
+//        if(pos.x>rect->x && pos.x<rect->x+rect->width && pos.y> rect->y){
+//            pos.y = rect->y;
+//            vel*=friction;
+//        }
+//        // side 1
+//        if(pos.y>rect->y && pos.y<rect->y+rect->height && pos.x> rect->x){
+//            pos.y = rect->y;
+//            vel*=friction;
+//        }
+//        // side 2
+//        if(pos.y>rect->y && pos.y<rect->y+rect->height && pos.x < rect->x + rect->width){
+//            pos.y = rect->y;
+//            vel*=friction;
+//        }
         
         //bounce of walls
         if(pos.x>boundaryXH){
@@ -212,7 +212,7 @@ public:
     float tlAlpha;
     float tlLength;
     bool sendOsc = true; 
-    ofxOscMessage m;
+
     float lPos =0;
     float lVel =0.05;
     

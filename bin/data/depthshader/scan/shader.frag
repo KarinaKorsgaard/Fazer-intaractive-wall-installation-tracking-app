@@ -17,12 +17,12 @@ void main()
     vec3 text = tex.xyz;
     
     
-    vec3 defaultColor = vec3(1.);
+    vec3 defaultColor = vec3(.9,0.9,1.0);
     
     vec3 finalColor = defaultColor;
     float value = (u_resolution.y-scanline)/u_resolution.y;
     vec2 aniuv = uv - value;
-    finalColor *= abs (0.05 / sin((aniuv.y)) * .10 ) + 0.0;
+    finalColor *= abs (0.05 / sin((aniuv.y)) * .12 ) + 0.0;
 
     if(finalColor.r>0.9){
         finalColor -= text * defaultColor;

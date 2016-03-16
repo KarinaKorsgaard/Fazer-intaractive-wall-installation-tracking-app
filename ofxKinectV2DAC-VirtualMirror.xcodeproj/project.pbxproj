@@ -449,7 +449,6 @@
 		21D320531C91C4E800C34E77 /* ofxCv */ = {
 			isa = PBXGroup;
 			children = (
-				21D320541C91C4E800C34E77 /* src */,
 				21D320561C91C4E800C34E77 /* libs */,
 				21D3207C1C91C4E800C34E77 /* opencv.a */,
 			);
@@ -881,6 +880,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				21D320541C91C4E800C34E77 /* src */,
 				E44C5EF11BFA8E8400C8F024 /* ofxGui */,
 				21D320491C91C4E000C34E77 /* ofxAutoReloadedShader */,
 				21D3204E1C91C4E300C34E77 /* ofxCsv */,
