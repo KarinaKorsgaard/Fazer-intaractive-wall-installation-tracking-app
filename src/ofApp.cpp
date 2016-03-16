@@ -58,7 +58,7 @@ void ofApp::setup(){
         logo.load(str);
         actor.img = logo;
         
-        str = "logo/UC/"+name+".png";
+        str = "logo/UC/dark/"+name+".png";
         if(ofIsStringInString(name, "TWITTER")){
             str = "logo/UC/TWITTER.png";
         }
