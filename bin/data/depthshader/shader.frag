@@ -23,10 +23,10 @@ void main(void) {
     vec2 uv = gl_FragCoord.xy / u_resolution.xy;
     
     float top = 0.;
-    float width = u_resolution.x;
+    float width = u_resolution.y;
     float bot = u_resolution.x;
     
-    float x = uv.x*width;
+    float x = uv.y*width;
     float d = 1.;
 
     

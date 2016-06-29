@@ -2,19 +2,23 @@
 
 #include "ofMain.h"
 #include "ofxKinectV2.h"
-#include "PointCloud.h"
+
 #include "ofxAutoReloadedShader.h"
 #include "DetectBody.h"
-#include "ofxSyphon.h"
+#include "ofxXmlSettings.h"
 #include "ofxCv.h"
 #include "ofxGui.h"
-#include "ofxCsv.h"
+
 #include "ofxOsc.h"
 
-#define RES_HEIGHT 1280
-#define RES_WIDTH 800
-#define PORT 4321
+
+
+#define PORT 8000
 #define HOST "localhost"
+
+#define K_W 512
+#define K_H 424
+
 
 class ofApp : public ofBaseApp{
 
@@ -24,97 +28,56 @@ class ofApp : public ofBaseApp{
 		void draw();
 
 		void keyPressed(int key);
-    
+
     float getAvgDepth(ofRectangle space, ofxKinectV2 *kinect);
-    void positions();
+
     void detectPerson();
-    void timeLine();
-    
-    ofPolyline contourPC;
+
+
+    vector<ofPolyline>people2D;
+ 
     ofImage contourDetectImg;
 
-    ofTrueTypeFont font;
     ofxKinectV2 kinect;
-    PointCloud pointCloud;
     DetectBody detectBody;
     
     ofTexture depthTex;
     ofxAutoReloadedShader depthShader;
-    ofxAutoReloadedShader scanner;
     ofFbo depthFbo;
-     ofFbo mainRender;
-    
-    ofFbo renderPC;
-    vector<DataPoint> datapoints;
-    vector<Actor> actors;
-    wng::ofxCsv csv;
-    
-    ofxSyphonServer syphon;
+    ofFbo testRender;
+    ofFbo contourRender;
+    ofxCv::ContourFinder contourFinder;
+    ofVboMesh mesh; // mesh to rotate
 
-    float falling;
-    int top = 0;
-    int bot = ofGetWidth();
     int imgIndx = 7;
     
-    ofxOscBundle b;
-    float scanLine;
-    
-    bool scanUp = false;
-    bool scanDown = false;
-    bool freeze = false;
-    bool updatePC = true;
-    bool setPositions;
-    bool isPersonPresent = false;
-    int isPPtimer = 0;
-    int isPPthres = 90; // number of frames befor scanline -> 90 = 3sec
-    bool ending = false;
-    int endTimer = 0;
-    int endTimerThres = 150;
-    bool endAnimation = false;
-    bool resetAll = false;
-    bool active = false;
-    
-    bool pScanActive = false;
-    
-    bool startFall = false;
-    int lastTimer = 0;
-    int lastTimerThres = 180;
-    int scanLineHeight = 100;
-    
-    float scVel = 1.1;
-    float scPos = 0;
-    
-    bool flash = false;
-    bool doFlash = true;
-    float flashTimer = 0;
-    float flashTimerThres = 10;
     
     bool bDebug = false;
-    bool debugAction = false;
-  //  bool debugAction = true;
-    
-    bool circleLogo = false;
-    bool actorsFixed = true;
+
+
     
     //close/open kinect counter. Does not work
     int counter = 0;
     
-    ofPolyline getBodyPoly();
+    void getBodyPolys(ofFbo myRender);
     
     // GUI / Controlpanel
     ofxPanel gui;
+    
     ofParameterGroup imageSetup;
     ofParameterGroup pointCloudSetup;
     ofParameterGroup testParams;
     ofParameterGroup paramters;
     ofParameter<float>   nearThreshold;
     ofParameter<float>   farThreshold;
-    ofParameter<float>   tilt;
+    ofParameter<float>   tilt,tiltX,tiltY,tiltZ;
 
     
     ofParameter<int>   translateX;
     ofParameter<int>   translateY;
     ofParameter<int>   translateZ;
+    
+    ofParameter<int>   resample;
     
     ofParameter<float>edge;
     ofParameter<float>topDepth;
@@ -122,17 +85,26 @@ class ofApp : public ofBaseApp{
     ofParameter<float>botDepth;
     ofParameter<float>edgeDepth;
     
-    ofParameter<int>   bPosX;
-    ofParameter<int>   thresW;
-    ofParameter<int>   bPosY;
-    ofParameter<int>   thresH;
-    ofParameter<int>   floor;
+    
+    ofParameter<int>appId;
+    ofParameter<float>blobMin;
+    ofParameter<float>blobMax;
+//    ofParameter<int>   bPosX;
+//    ofParameter<int>   thresW;
+//    ofParameter<int>   bPosY;
+//    ofParameter<int>   thresH;
+//    ofParameter<int>   floor;
     
     //ofRectangle thePerson;
     
     
-    
-    ofxOscMessage msg;
     ofxOscSender sender;
+    ofxOscSender localSender;
+
+    
+    string message;
+    
+
+    
    
 };

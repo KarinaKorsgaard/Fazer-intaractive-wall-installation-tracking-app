@@ -7,6 +7,7 @@
 
 #include "DetectBody.h"
 
+
 using namespace cv;
 
 
@@ -47,20 +48,17 @@ void DetectBody::setup( int _w, int _h, int _nearThreshold, int _farThreshold)
     }
 }
 
-void DetectBody::update(cv::Mat image)
+void DetectBody::update(cv::Mat image, ofxKinectV2 *kinect)
 {
     image.convertTo(depthImage, CV_8UC1);
     
-    
     depthImage.copyTo(inputImage);
-    
-    
     
     outputImage.begin();
     ofClear(255,255,255, 0);
     outputImage.end();
     
-    bool justActiveArea = true; // norm true
+    bool justActiveArea = false; // norm true
     if(justActiveArea) {
         bitwise_and(depthImage, activeAreaMask, depthImage);
     }
@@ -86,10 +84,10 @@ void DetectBody::update(cv::Mat image)
         Mat depthImageCanny = Mat::zeros( cvSize(width,height), CV_8UC1 );
         
         
-        Canny(depthImage, depthImageCanny, 27,79, 3); // for K:V2 130, 100, 3);
+       // Canny(depthImage, depthImageCanny, 27,79, 3); // for K:V2 130, 100, 3);
         
-        dilate(depthImageCanny, depthImageCanny, cv::Mat(), cv::Point(-1,-1), 2);
-        erode(depthImageCanny, depthImageCanny, cv::Mat(), cv::Point(-1,-1), 1);
+       // dilate(depthImageCanny, depthImageCanny, cv::Mat(), cv::Point(-1,-1), 2);
+       // erode(depthImageCanny, depthImageCanny, cv::Mat(), cv::Point(-1,-1), 1);
         
         threshold(depthImage, depthImage, 50, 255, THRESH_BINARY );
         
@@ -151,15 +149,19 @@ void DetectBody::update(cv::Mat image)
         for(vector<Body>::iterator b=bodies.begin(); b!=bodies.end(); b++)
         {
             
-            b->indices.clear();
-            
             for(int y=0; y<b->bodyBlob.rows; y++)
             {
                 for(int x=0; x<b->bodyBlob.cols; x++)
                 {
                     if(b->bodyBlob.at<bool>(y, x))
                     {
-                        b->indices.push_back(ofVec2f(x, y));
+                        ofVec3f pt = kinect->getWorldCoordinateAt(x,y);
+                        
+                        float y = pt.y;
+                        
+                        pt.y = y*cos(tilt)-pt.z*sin(tilt);
+                        
+                        b->indices.push_back(ofVec2f(pt.x,pt.y));
                         //indices.data[indices.size] = Point2Di(x, y);
                         //indices.size++;
                     }
@@ -209,13 +211,18 @@ void DetectBody::drawProcess(int x, int y, int w, int h, int index)
 
 // GET DATA
 
+
 vector<Body> DetectBody::getBodies(){
+    ofSort(bodies,sortMe);
     return bodies;
 }
 
 vector<ofPolyline> DetectBody::getContours(){
     vector<ofPolyline> bodiesPolys;
     for(int i = 0; i<bodies.size();i++){
+        
+        
+        
         bodiesPolys.push_back(bodies[i].boundaryPoly);
     }
     return bodiesPolys;
@@ -327,6 +334,7 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
         cv::Moments m = moments(contoursLocal[i]);
         center = ofxCv::toOf(cv::Point2f(m.m10 / m.m00, m.m01 / m.m00));
         bodies[i].centroid = center;
+        
     }
     
     

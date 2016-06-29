@@ -117,7 +117,7 @@ public:
         // bind the texture so that when all the points
         // are drawn they are replace with our dot image
         texSpline.bind();
-        vbo.draw(GL_POINTS, 0, (int)mesh.getVertices().size());
+        if((int)mesh.getVertices().size()>0)vbo.draw(GL_POINTS, 0, (int)mesh.getVertices().size());
         texSpline.unbind();
         shaderSplineReplace.end();
         ofDisablePointSprites();
