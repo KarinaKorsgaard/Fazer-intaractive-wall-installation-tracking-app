@@ -50,8 +50,7 @@ class ofApp : public ofBaseApp{
     ofVboMesh mesh; // mesh to rotate
 
     int imgIndx = 7;
-    
-    
+     
     bool bDebug = false;
 
 

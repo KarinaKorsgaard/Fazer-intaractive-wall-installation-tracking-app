@@ -109,7 +109,9 @@ void ofApp::setup(){
     message = "port: "+ ofToString(PORT+appId) + " "+ip;
     
     ofSetFrameRate(30);
+    soundSender.setup("localhost",3000);
     
+
 }
 
 

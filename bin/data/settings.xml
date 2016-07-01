@@ -34,7 +34,7 @@
 		<thresH>130</thresH>
 	</testParams>
 	<pointCloudSetup>
-		<tilt>-1.92857</tilt>
+		<tilt>-1.85714</tilt>
 		<translateX>816</translateX>
 		<translateY>-1836</translateY>
 		<translateZ>-8367</translateZ>
@@ -43,12 +43,12 @@
 		<tiltY>0</tiltY>
 		<tiltZ>0</tiltZ>
 	<pointsize>0.153061</pointsize>
-	<smoothe>26.1735</smoothe>
+	<smoothe>24.1735</smoothe>
 	<amout_of_Particles>20</amout_of_Particles>
-	<closingNum>2.2449</closingNum>
+	<closingNum>3.4449</closingNum>
 	</pointCloudSetup>
 <general>
-		<appId>1</appId>
+		<appId>4</appId>
 		<blobMin>1327.4</blobMin>
 		<blobMax>900000</blobMax>
 	<resampleSpacing>13</resampleSpacing>
