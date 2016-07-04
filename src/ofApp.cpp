@@ -37,7 +37,7 @@ void ofApp::setup(){
     
     
     
-    contourRender.allocate(K_W*2 , K_H*2, GL_R16);
+    contourRender.allocate(K_W , K_H, GL_R16);
     contourRender.begin();
     ofClear(0);
     contourRender.end();
@@ -109,7 +109,7 @@ void ofApp::setup(){
     message = "port: "+ ofToString(PORT+appId) + " "+ip;
     
     ofSetFrameRate(30);
-    soundSender.setup("localhost",3000);
+
     
 
 }
@@ -159,8 +159,6 @@ void ofApp::update(){
         detectBody.update(ofxCv::toCv(depthImage), &kinect);
         detectBody.setTresholds(nearThreshold, farThreshold, tilt);
         
-        
-        
         mesh.clear();
         vector<Body>bodyPolys = detectBody.getBodies(); // sort by farthest away ->first. ???
         for(int i = 0 ; i<bodyPolys.size();i++){ // get the body polys to pass for the pointcloud
@@ -172,15 +170,10 @@ void ofApp::update(){
             
             for(vector<ofVec2f>::iterator ind=bodyPolys[i].indices.begin(); ind!=bodyPolys[i].indices.end(); ind++){
                 indx++;
-                
                 if(indx%2 == 0){
-                    
-                    
                     mesh.addVertex(ofVec3f(ind->x+translateX,ind->y+translateY,-3000));
-                    
                 }
             }
-            
         }
         
         
@@ -273,26 +266,36 @@ void ofApp::update(){
 void ofApp::draw(){
     
     if(bDebug){
-        if(contourDetectImg.isAllocated())contourDetectImg.draw(0, 0);
-        if(contourRender.isAllocated())contourRender.draw(0,0);
-        ofPushMatrix();
-        ofTranslate(contourDetectImg.getWidth()-K_W, 0);
-        detectBody.drawProcess(0,0,K_W,K_H,imgIndx);
-        detectBody.drawOverlay(0,0,K_W,K_H);
-        ofSetColor(ofColor::green);
-        ofDrawLine(0, edge, K_W, edge);
-        ofPopMatrix();
         
+        
+        ofEnableAlphaBlending();
+        
+        ofPushMatrix();
+        ofTranslate(0,0);
+        
+        if(contourRender.isAllocated())contourRender.draw(0,0);
         for(int u= 0; u<people2D.size();u++){
             ofSetColor(ofColor::red);
             people2D[u].draw();
             
             ofSetColor(ofColor::white);
             for(int i = 0; i< people2D[u].getVertices().size();i++){
-                ofCircle(people2D[u].getVertices()[i],2);
+                ofDrawCircle(people2D[u].getVertices()[i],2);
             }
 
         }
+        if(contourDetectImg.isAllocated())contourDetectImg.draw(0, 424);
+        
+        ofPopMatrix();
+        
+        ofPushMatrix();
+        ofTranslate(512, 0);
+        detectBody.drawProcess(0,0,K_W,K_H,imgIndx);
+        detectBody.drawOverlay(0,0,K_W,K_H);
+        ofSetColor(ofColor::green);
+        ofDrawLine(0, edge, K_W, edge);
+        ofPopMatrix();
+        
         gui.draw();
         ofDrawBitmapString(message,10,gui.getHeight()+50);
     }

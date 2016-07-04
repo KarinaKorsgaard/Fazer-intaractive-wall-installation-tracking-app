@@ -9,10 +9,10 @@
 		<scaleY>0</scaleY>
 		<scaleZ>0</scaleZ>
 		<rotate>0</rotate>
-	<edge>42.7755</edge>
-		<topDepth>0</topDepth>
-		<botDepth>3020.41</botDepth>
-		<edgeDepth>2857.14</edgeDepth>
+	<edge>344.878</edge>
+		<topDepth>7346.94</topDepth>
+		<botDepth>0</botDepth>
+		<edgeDepth>3795.92</edgeDepth>
 	</imageSetup>
 	<group/>
 	<tilt>0</tilt>
@@ -34,23 +34,23 @@
 		<thresH>130</thresH>
 	</testParams>
 	<pointCloudSetup>
-		<tilt>-1.85714</tilt>
-		<translateX>816</translateX>
-		<translateY>-1836</translateY>
+		<tilt>1.85714</tilt>
+		<translateX>0</translateX>
+		<translateY>3265</translateY>
 		<translateZ>-8367</translateZ>
 	<floor>1551</floor>
 	<tiltX>0</tiltX>
 		<tiltY>0</tiltY>
 		<tiltZ>0</tiltZ>
 	<pointsize>0.153061</pointsize>
-	<smoothe>24.1735</smoothe>
+	<smoothe>25.8673</smoothe>
 	<amout_of_Particles>20</amout_of_Particles>
-	<closingNum>3.4449</closingNum>
+	<closingNum>6.32653</closingNum>
 	</pointCloudSetup>
 <general>
 		<appId>4</appId>
-		<blobMin>1327.4</blobMin>
+		<blobMin>1</blobMin>
 		<blobMax>900000</blobMax>
-	<resampleSpacing>13</resampleSpacing>
+	<resampleSpacing>14</resampleSpacing>
 	</general>
 </group>
