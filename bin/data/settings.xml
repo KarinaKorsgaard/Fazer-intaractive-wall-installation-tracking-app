@@ -1,7 +1,7 @@
 <group>
 	<imageSetup>
 		<nearThreshold>0</nearThreshold>
-		<farThreshold>8000</farThreshold>
+		<farThreshold>4571.43</farThreshold>
 	<translateX>0</translateX>
 		<translateY>-551</translateY>
 		<translateZ>20</translateZ>
@@ -9,10 +9,10 @@
 		<scaleY>0</scaleY>
 		<scaleZ>0</scaleZ>
 		<rotate>0</rotate>
-	<edge>344.878</edge>
-		<topDepth>7346.94</topDepth>
+	<edge>462.51</edge>
+		<topDepth>7020.41</topDepth>
 		<botDepth>0</botDepth>
-		<edgeDepth>3795.92</edgeDepth>
+		<edgeDepth>8000</edgeDepth>
 	</imageSetup>
 	<group/>
 	<tilt>0</tilt>
@@ -36,16 +36,16 @@
 	<pointCloudSetup>
 		<tilt>1.85714</tilt>
 		<translateX>0</translateX>
-		<translateY>3265</translateY>
+		<translateY>4489</translateY>
 		<translateZ>-8367</translateZ>
 	<floor>1551</floor>
 	<tiltX>0</tiltX>
 		<tiltY>0</tiltY>
 		<tiltZ>0</tiltZ>
 	<pointsize>0.153061</pointsize>
-	<smoothe>25.8673</smoothe>
+	<smoothe>20.051</smoothe>
 	<amout_of_Particles>20</amout_of_Particles>
-	<closingNum>6.32653</closingNum>
+	<closingNum>0</closingNum>
 	</pointCloudSetup>
 <general>
 		<appId>4</appId>

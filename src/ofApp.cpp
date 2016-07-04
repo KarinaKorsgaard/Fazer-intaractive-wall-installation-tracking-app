@@ -15,29 +15,15 @@ using namespace cv;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-   	ofDisableAntiAliasing();
-    //    ofBackgroundHex(0xfdefc2);
-    ofSetLogLevel(OF_LOG_NOTICE);
-    ofSetVerticalSync(true);
-    
-    //    // Box2d
-    //    box2d.init();
-    //    box2d.setGravity(0, 30);
-    //    box2d.createGround();
-    //    box2d.setFPS(60.0);
-    //
-    
-    
-    
-    
+
+    ofSetVerticalSync(false);
+
     depthFbo.allocate(K_W, K_H, GL_R16);
     depthFbo.begin();
     ofClear(0);
     depthFbo.end();
     
-    
-    
-    contourRender.allocate(K_W , K_H, GL_R16);
+    contourRender.allocate(K_W + 100, K_H + 100, GL_R16);
     contourRender.begin();
     ofClear(0);
     contourRender.end();
@@ -103,7 +89,7 @@ void ofApp::setup(){
     xml.pushTag("document");
     string ip = xml.getValue("ip", "");
     
-    sender.setup(ip,PORT+appId);
+    sender.setup("localhost",PORT+appId);
     sender.enableBroadcast();
     localSender.setup("localhost",4321);
     message = "port: "+ ofToString(PORT+appId) + " "+ip;
@@ -258,7 +244,8 @@ void ofApp::update(){
         msg.setAddress("/shutdown");
         localSender.sendMessage(msg);
     }
-
+    
+ 
 
 }
 
@@ -273,7 +260,8 @@ void ofApp::draw(){
         ofPushMatrix();
         ofTranslate(0,0);
         
-        if(contourRender.isAllocated())contourRender.draw(0,0);
+        if(contourDetectImg.isAllocated())contourDetectImg.draw(0, 0);
+       // if(contourRender.isAllocated())contourRender.draw(0,0);
         for(int u= 0; u<people2D.size();u++){
             ofSetColor(ofColor::red);
             people2D[u].draw();
@@ -284,7 +272,7 @@ void ofApp::draw(){
             }
 
         }
-        if(contourDetectImg.isAllocated())contourDetectImg.draw(0, 424);
+        
         
         ofPopMatrix();
         
