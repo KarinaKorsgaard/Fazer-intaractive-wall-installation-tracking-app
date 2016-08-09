@@ -79,10 +79,13 @@ class ofApp : public ofBaseApp{
     ofParameter<int>   resample;
     
     ofParameter<float>edge;
+    ofParameter<float>edge2;
     ofParameter<float>topDepth;
     ofParameter<float>topEdgeDepth;
     ofParameter<float>botDepth;
     ofParameter<float>edgeDepth;
+    ofParameter<float>edgeDepth2;
+
     
     
     ofParameter<int>appId;

@@ -38,6 +38,19 @@
 		"subpatcher_template" : "",
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-8",
+					"maxclass" : "newobj",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "bang" ],
+					"patching_rect" : [ 193.0, 268.0, 76.0, 22.0 ],
+					"style" : "",
+					"text" : "delay 10000"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-27",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
@@ -84,7 +97,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 472.0, 123.0, 50.0, 22.0 ],
 					"style" : "",
-					"text" : "1321"
+					"text" : "1415"
 				}
 
 			}
@@ -243,7 +256,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 566.0, 346.0, 50.0, 22.0 ],
 									"style" : "",
-									"text" : "1321"
+									"text" : "1415"
 								}
 
 							}
@@ -799,9 +812,9 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 93.0, 333.0, 439.0, 35.0 ],
+					"patching_rect" : [ 93.0, 333.0, 507.0, 35.0 ],
 					"style" : "",
-					"text" : "osascript -e 'tell application \\\"/Users/fazerminione/Desktop/tracking/bin/fazerTrackingDebug.app\\\" to activate'"
+					"text" : "osascript -e 'tell application \\\"/Users/fazerminione/Desktop/tracking/bin/fazerTracking.app\\\" to activate'"
 				}
 
 			}
@@ -979,7 +992,7 @@
 			}
 , 			{
 				"patchline" : 				{
-					"destination" : [ "obj-7", 0 ],
+					"destination" : [ "obj-8", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-6", 0 ]
@@ -992,6 +1005,15 @@
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-7", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-7", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-8", 0 ]
 				}
 
 			}

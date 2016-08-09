@@ -219,6 +219,10 @@
 		215FE93C1D23C4D200C9ED77 /* tinyxml.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tinyxml.h; sourceTree = "<group>"; };
 		215FE93D1D23C4D200C9ED77 /* tinyxmlerror.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlerror.cpp; sourceTree = "<group>"; };
 		215FE93E1D23C4D200C9ED77 /* tinyxmlparser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlparser.cpp; sourceTree = "<group>"; };
+		215FE9581D2C031F00C9ED77 /* shader.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.frag; sourceTree = "<group>"; };
+		215FE9591D2C031F00C9ED77 /* shader.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.vert; sourceTree = "<group>"; };
+		215FE95A1D2C031F00C9ED77 /* scanShader.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = scanShader.frag; sourceTree = "<group>"; };
+		215FE95B1D2C031F00C9ED77 /* shader.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.frag; sourceTree = "<group>"; };
 		217E78761D09B39100443146 /* ofxBox2d.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxBox2d.cpp; sourceTree = "<group>"; };
 		217E78771D09B39100443146 /* ofxBox2d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxBox2d.h; sourceTree = "<group>"; };
 		217E78781D09B39100443146 /* ofxBox2dBaseShape.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxBox2dBaseShape.cpp; sourceTree = "<group>"; };
@@ -652,6 +656,26 @@
 			);
 			name = libs;
 			path = ../../../addons/ofxXmlSettings/libs;
+			sourceTree = "<group>";
+		};
+		215FE9561D2C031F00C9ED77 /* depthshader */ = {
+			isa = PBXGroup;
+			children = (
+				215FE9571D2C031F00C9ED77 /* scan */,
+				215FE95A1D2C031F00C9ED77 /* scanShader.frag */,
+				215FE95B1D2C031F00C9ED77 /* shader.frag */,
+			);
+			name = depthshader;
+			path = bin/data/depthshader;
+			sourceTree = SOURCE_ROOT;
+		};
+		215FE9571D2C031F00C9ED77 /* scan */ = {
+			isa = PBXGroup;
+			children = (
+				215FE9581D2C031F00C9ED77 /* shader.frag */,
+				215FE9591D2C031F00C9ED77 /* shader.vert */,
+			);
+			path = scan;
 			sourceTree = "<group>";
 		};
 		217E78741D09B39100443146 /* ofxBox2d */ = {
@@ -1424,6 +1448,7 @@
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
+				215FE9561D2C031F00C9ED77 /* depthshader */,
 				21D3211F1C91C55500C34E77 /* Body.h */,
 				21D321201C91C55500C34E77 /* DetectBody.cpp */,
 				21D321211C91C55500C34E77 /* DetectBody.h */,

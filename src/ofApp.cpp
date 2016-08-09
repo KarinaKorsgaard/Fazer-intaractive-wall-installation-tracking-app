@@ -50,12 +50,13 @@ void ofApp::setup(){
     general.add(resample.set("resampleSpacing",3,1,30));
     
     imageSetup.setName("imageSetup");
-    imageSetup.add(nearThreshold.set("nearThreshold", 10, 0, 8000));
-    imageSetup.add(farThreshold.set("farThreshold", 25, 0, 8000));
+
     imageSetup.add(edge.set("edge", 0, 0, 524));
+    imageSetup.add(edge2.set("edge2", 0, 0, 524));
     imageSetup.add(topDepth.set("topDepth", 0, 0, 8000));
-    imageSetup.add(botDepth.set("botDepth", 0, 0, 8000));
     imageSetup.add(edgeDepth.set("edgeDepth", 0, 0, 8000));
+    imageSetup.add(botDepth.set("botDepth", 0, 0, 8000));
+    
     
     
     pointCloudSetup.setName("pointCloudSetup");
@@ -89,7 +90,7 @@ void ofApp::setup(){
     xml.pushTag("document");
     string ip = xml.getValue("ip", "");
     
-    sender.setup("localhost",PORT+appId);
+    sender.setup(ip,PORT+appId);
     sender.enableBroadcast();
     localSender.setup("localhost",4321);
     message = "port: "+ ofToString(PORT+appId) + " "+ip;
@@ -121,13 +122,13 @@ void ofApp::update(){
         ofClear(0);
         depthShader.begin();
         
-        depthShader.setUniform1f("nearThreshold", nearThreshold);
-        depthShader.setUniform1f("farThreshold", farThreshold);
+
         depthShader.setUniform1f("topDepth", topDepth);
         depthShader.setUniform1f("topEdgeDepth", topEdgeDepth);
         depthShader.setUniform1f("botDepth", botDepth);
         depthShader.setUniform1f("edgeDepth", edgeDepth);
         depthShader.setUniform1f("edge", edge);
+        depthShader.setUniform1f("edge2", edge2);
         depthShader.setUniform2f("u_resolution", K_W, K_H);
         
         depthTex.draw(0, 0, K_W, K_H);
@@ -143,7 +144,7 @@ void ofApp::update(){
         
         // Detect if there are objects in the Space
         detectBody.update(ofxCv::toCv(depthImage), &kinect);
-        detectBody.setTresholds(nearThreshold, farThreshold, tilt);
+        detectBody.setTresholds(0, 8000, tilt);
         
         mesh.clear();
         vector<Body>bodyPolys = detectBody.getBodies(); // sort by farthest away ->first. ???
@@ -282,6 +283,7 @@ void ofApp::draw(){
         detectBody.drawOverlay(0,0,K_W,K_H);
         ofSetColor(ofColor::green);
         ofDrawLine(0, edge, K_W, edge);
+        ofDrawLine(0, edge2, K_W, edge2);
         ofPopMatrix();
         
         gui.draw();
@@ -289,29 +291,14 @@ void ofApp::draw(){
     }
     
     ofSetWindowTitle("FrameRate: "+ ofToString(ofGetFrameRate()));
-    
+    ofDrawBitmapStringHighlight("w,z vertical adjust. a,s horisontal. t=tilt up, g=tilt down", 10,gui.getHeight()+70);
+    ofDrawBitmapStringHighlight("n,m edgeDepth adjust.", 10,gui.getHeight()+100);
     
     
     
 };
 
 
-//--------------------------------------------------------------
-
-
-float ofApp::getAvgDepth(ofRectangle space, ofxKinectV2 *kinect){
-    int div = 0;
-    float avgDepth = 0;
-    for(int y = space.y; y < space.y+space.height; y ++) {
-        for(int x = space.x; x < space.x+space.width; x ++) {
-            avgDepth += kinect->getWorldCoordinateAt(x, y).z;
-            div++;
-            
-        }
-    }
-    return avgDepth/div;
-    
-}
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
@@ -320,27 +307,18 @@ void ofApp::keyPressed(int key){
         bDebug = !bDebug;
     }
     
-    if(key == '1') {
-        imgIndx = 1;
-    }
-    if(key == '2') {
-        imgIndx = 2;
-    }
-    if(key == '3') {
-        imgIndx = 3;
-    }
-    if(key == '4') {
-        imgIndx = 4;
-    }
-    if(key == '5') {
-        imgIndx = 5;
-    }
-    if(key == '6') {
-        imgIndx = 6;
-    }
-    if(key == '7') {
-        imgIndx = 7;
-    }
+
+    
+    if(key=='w')translateY+=10;
+    if(key=='z')translateY-=10;
+    if(key=='s')translateX+=10;
+    if(key=='a')translateX-=10;
+    
+    if(key=='t')tilt+=0.1;
+    if(key=='g')tilt-=0.1;
+    
+    if(key=='n')edgeDepth++;
+    if(key=='m')edgeDepth--;
     
 }
 

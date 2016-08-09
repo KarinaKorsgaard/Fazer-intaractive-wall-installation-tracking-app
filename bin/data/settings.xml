@@ -1,7 +1,7 @@
 <group>
 	<imageSetup>
 		<nearThreshold>0</nearThreshold>
-		<farThreshold>4571.43</farThreshold>
+		<farThreshold>8000</farThreshold>
 	<translateX>0</translateX>
 		<translateY>-551</translateY>
 		<translateZ>20</translateZ>
@@ -9,10 +9,11 @@
 		<scaleY>0</scaleY>
 		<scaleZ>0</scaleZ>
 		<rotate>0</rotate>
-	<edge>462.51</edge>
-		<topDepth>7020.41</topDepth>
-		<botDepth>0</botDepth>
-		<edgeDepth>8000</edgeDepth>
+	<edge>184.469</edge>
+		<topDepth>0</topDepth>
+		<botDepth>2816.33</botDepth>
+		<edgeDepth>3075.22</edgeDepth>
+	<edge2>320.816</edge2>
 	</imageSetup>
 	<group/>
 	<tilt>0</tilt>
@@ -34,22 +35,22 @@
 		<thresH>130</thresH>
 	</testParams>
 	<pointCloudSetup>
-		<tilt>1.85714</tilt>
+		<tilt>-1.42857</tilt>
 		<translateX>0</translateX>
-		<translateY>4489</translateY>
+		<translateY>-1390</translateY>
 		<translateZ>-8367</translateZ>
 	<floor>1551</floor>
 	<tiltX>0</tiltX>
 		<tiltY>0</tiltY>
 		<tiltZ>0</tiltZ>
-	<pointsize>0.153061</pointsize>
-	<smoothe>20.051</smoothe>
+	<pointsize>1.68367</pointsize>
+	<smoothe>6.58163</smoothe>
 	<amout_of_Particles>20</amout_of_Particles>
-	<closingNum>0</closingNum>
+	<closingNum>1.02041</closingNum>
 	</pointCloudSetup>
 <general>
 		<appId>4</appId>
-		<blobMin>1</blobMin>
+		<blobMin>511.153</blobMin>
 		<blobMax>900000</blobMax>
 	<resampleSpacing>14</resampleSpacing>
 	</general>
