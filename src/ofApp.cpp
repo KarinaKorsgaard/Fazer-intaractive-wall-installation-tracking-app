@@ -163,8 +163,6 @@ void ofApp::update(){
             }
         }
         
-        
-        
         contourRender.begin();
         
         ofClear(0);

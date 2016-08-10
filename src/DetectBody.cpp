@@ -337,94 +337,7 @@ void DetectBody::getbodyBoundries(cv::Mat _armBlobs){
         
     }
     
-    
-    
-    
-    
-    /*
-     
-     // from kinectArms
-     
-     const int smallBoundarySize = 40;
-     vector<CvSeq*> contours;
-     for(CvSeq* contour = firstContour; contour!= 0; contour = contour->h_next)
-     {
-     // Remove any small boundaries
-     if(contour->total < smallBoundarySize)
-     continue;
-     
-     contours.push_back(contour);
-     }
-     
-     
-     
-     // Get the contours of the blobs
-     static CvSeq* firstContour = 0;
-     
-     Mat armBlobsDilated = _armBlobs;
-     
-     dilate(armBlobsDilated, armBlobsDilated, cv::Mat(), cv::Point(-1,-1), 1);
-     
-     CvMat armsBlobCvMat = armBlobsDilated;//_armBlobs;
-     static CvMemStorage* storage = cvCreateMemStorage(0);
-     
-     
-     int numContours = cvFindContours(&armsBlobCvMat, storage, &firstContour, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
-     
-     
-     
-     // Put contours in a nice list and get rid of all small contours
-     const int smallBoundarySize = 40;
-     vector<CvSeq*> contours;
-     for(CvSeq* contour = firstContour; contour!= 0; contour = contour->h_next)
-     {
-     // Remove any small boundaries
-     if(contour->total < smallBoundarySize)
-     continue;
-     
-     contours.push_back(contour);
-     }
-     
-     
-     // Clear all previous bodies
-     bodies.clear();
-     
-     
-     // Get the body boundaries (take as many as we are allowed)
-     bodies.resize(contours.size());
-     for(int i=0; i<bodies.size(); i++)
-     {
-     CvSeq& contour = *contours[i];
-     bodies[i].boundrySeq = &contour;
-     //  ((bodyPimpl*)bodies[i].bodyPimpl)->SetBoundary(contour);
-     
-     CvSeqReader reader;
-     cvStartReadSeq(&contour, &reader, 0);
-     
-     for(int j=0; j<contour.total; j++)
-     {
-     CvPoint point;
-     memcpy(&point, reader.ptr, contour.elem_size);
-     
-     bodies[i].boundary.push_back(ofVec2f(point.x, point.y));
-     
-     CV_NEXT_SEQ_ELEM(contour.elem_size, reader);
-     }
-     
-     
-     
-     //   cvDrawContours(&blobImage, const_cast<CvSeq*>(((bodyPimpl*)bodyPimpl)->GetBoundary()), color, color, 0, thickness);
-     
-     IplImage armBlobImage = bodies[i].armBlob;
-     
-     cvDrawContours( &armBlobImage, &contour, CV_RGB(255, 255, 255), CV_RGB(255, 255, 255), 0, -1);
-     //bodies[i].armBlob = Mat(armBlobImage, true);
-     
-     //   cv::drawContours(bodies[i].armBlob, contours, i, CV_RGB(255, 255, 255));
-     
-     
-     }
-     */
+
 }
 
 ofVec2f DetectBody::findArmBase(cv::Mat tableEdges, Body &_body)
@@ -449,13 +362,7 @@ ofVec2f DetectBody::findArmBase(cv::Mat tableEdges, Body &_body)
     
     // Find a boundary point that isn't on the table edge
     int startIndex = -1;
-    /*for(int iy=0; iy<tableEdges.rows; iy++){
-     for(int ix=0; ix<tableEdges.cols; ix++){
-     cout << tableEdges.at<bool>(iy, ix);
-     }
-     cout << "\n";
-     }*/
-    
+
     bool flag = false;
     
     for(int j=0; j<_body.boundary.size(); j++)
